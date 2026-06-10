@@ -39,7 +39,7 @@
                     window.trackQueueIndex = -1;
                     // Pass server-side playlists to JS
                     window.userPlaylistsData = <%- JSON.stringify((userPlaylists || []).filter(p => p.name !== 'Liked Songs').map(p => ({ id: p._id, name: p.name }))) %>;
-                    window.isUserRole = <%= account.role === 'user' ? 'true' : 'false' %>;
+                    window.isUserRole = <%= account.role === 'user' %>;
                 </script>
 
                 <!-- LIST VIEW -->
@@ -156,8 +156,6 @@
     </main>
 </div>
 
-    </div>
-</div>
 
 <script>
 // ─── View Toggle ──────────────────────────────────────────────────────────

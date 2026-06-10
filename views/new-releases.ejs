@@ -1,82 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Releases | Music App</title>
-    
-    <!-- STEP 1: CSS ka link add karein -->
-    <link rel="stylesheet" href="/css/style_dashboard.css"> 
-    
+    <title>New Releases | MusicHub</title>
+    <meta name="description" content="Discover the latest new album releases on MusicHub.">
+    <link rel="stylesheet" href="/css/style_dashboard.css">
 </head>
 <body>
-    <div class="dashboard-container">
-        
-        <!-- Sidebar ko partial se include karein -->
-        <%- include('partials/sidebar') %>
+<div class="dashboard-container">
+    <%- include('partials/sidebar') %>
+    <main class="main-content">
+        <%- include('partials/header') %>
 
-        <main class="main-content">
-            
-            <!-- Header ko partial se include karein -->
-            <%- include('partials/header') %>
-            
-            <section class="content-area">
-                <div class="playlist-section">
-                    <h2>New Releases</h2>
-                    <div class="playlist-grid">
-                        <% albums.forEach(album => { %>
-                            <% if (album) { %>
-                                <a href="/album/<%= album.id || 'default_album' %>" class="playlist-card-link">
-                                    <div class="playlist-card">
-                                        <% if (album.images && album.images.length > 0) { %>
-                                            <img src="<%= album.images[0].url %>" alt="<%= album.name %> Cover">
-                                        <% } %>
-                                        <div class="card-text-content">
-                                            <h4><%= album.name %></h4>
-                                            <p><%= album.artists.map(artist => artist.name).join(', ') %></p>
-                                        </div>
-                                    </div>
-                                </a>
-                            <% } %>
-                        <% }); %>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
+        <section class="content-area">
+            <div class="page-header">
+                <h1 style="font-size:1.8rem;font-weight:800;margin:0;">🆕 New Releases</h1>
+                <p style="color:var(--text-muted);margin:6px 0 0;">Fresh albums and singles just dropped</p>
+            </div>
 
-    <!-- STEP 2: Zaroori JavaScript add karein -->
-    <script>
-        // Search bar logic
-        const searchInput = document.querySelector('.search-bar input');
-        if (searchInput) {
-            searchInput.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter') {
-                    const query = searchInput.value;
-                    if (query.trim() !== '') {
-                        window.location.href = `/search?q=${encodeURIComponent(query)}`;
-                    }
-                }
-            });
-        }
-
-        // Dropdown logic
-        function toggleDropdown() {
-            const dropdown = document.getElementById("myDropdown");
-            if (dropdown) {
-                dropdown.classList.toggle("show");
-            }
-        }
-        window.onclick = function(event) {
-            if (!event.target.matches('.profile-button, .profile-button *')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    if (dropdowns[i].classList.contains('show')) {
-                        dropdowns[i].classList.remove('show');
-                    }
-                }
-            }
-        }
-    </script>
+            <% if (albums && albums.length > 0) { %>
+            <div class="feed-tracks-grid" style="margin-top:24px;">
+                <% albums.forEach(album => { %>
+                    <% if (album) { %>
+                    <a href="/album/<%= album.id || 'default_album' %>" class="feed-track-card-link" style="text-decoration:none;color:inherit;display:block;">
+                        <div class="feed-track-card">
+                            <div class="feed-track-cover">
+                                <% if (album.images && album.images.length > 0) { %>
+                                    <img src="<%= album.images[0].url %>" alt="<%= album.name %>" loading="lazy" onerror="this.src='https://placehold.co/200x200/0f2038/ffd700?text=Album'">
+                                <% } else { %>
+                                    <div style="width:100%;aspect-ratio:1;background:var(--bg-surface);display:flex;align-items:center;justify-content:center;font-size:2rem;">💿</div>
+                                <% } %>
+                                <div class="feed-track-play-overlay">
+                                    <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>
+                            <div class="feed-track-info">
+                                <div class="feed-track-name"><%= album.name %></div>
+                                <div class="feed-track-artist">
+                                    <% if (album.artists && album.artists.length > 0) { %>
+                                        <%= album.artists.map(a => a.name).join(', ') %>
+                                    <% } else { %>
+                                        Various Artists
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <% } %>
+                <% }); %>
+            </div>
+            <% } else { %>
+            <div class="empty-state-card" style="margin-top:40px;">
+                <div class="empty-state-icon">💿</div>
+                <h3>No New Releases</h3>
+                <p>Check back soon for the latest music drops.</p>
+                <a href="javascript:history.back()" class="btn-create">← Go Back</a>
+            </div>
+            <% } %>
+        </section>
+    </main>
+</div>
 </body>
 </html>

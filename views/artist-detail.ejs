@@ -51,10 +51,10 @@
                         </div>
                     </div>
                     <% if (account.role === 'user') { %>
-                    <% const isFollowing = artist.followers && artist.followers.some(f => f.toString() === account._id.toString()); %>
+                    <% const isFollowing = artist.followers && Array.isArray(artist.followers) && artist.followers.some(f => f.toString() === account._id.toString()); %>
                     <button id="follow-btn"
                             class="follow-btn <%= isFollowing ? 'following' : '' %>"
-                            onclick="toggleFollow('<%= artist._id %>')">
+                            onclick="toggleFollow('<%= artist._id || artist.id %>')">
                         <%= isFollowing ? '✓ Following' : '+ Follow' %>
                     </button>
                     <% } %>

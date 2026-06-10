@@ -1,89 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Browse Artists | Music App</title>
-    
-    <link rel="stylesheet" href="/css/style_dashboard.css"> 
-    
+    <title><%= pageTitle %> | MusicHub</title>
+    <meta name="description" content="Browse top artists on MusicHub.">
+    <link rel="stylesheet" href="/css/style_dashboard.css">
 </head>
 <body>
-    <div class="dashboard-container">
-        
-        <%- include('partials/sidebar') %>
+<div class="dashboard-container">
+    <%- include('partials/sidebar') %>
+    <main class="main-content">
+        <%- include('partials/header') %>
 
-        <main class="main-content">
-            
-            <%- include('partials/header') %>
-            
-            <section class="content-area">
-                <div class="playlist-section">
-                    
-                    <!-- NEW: Artist Search Form -->
-                    <div class="artist-search-header">
-                        <h2><%= pageTitle %></h2>
-                        <form action="/browse/artists" method="GET" class="artist-search-form">
-                            <input type="text" name="q" placeholder="Search for an artist..." value="<%= query %>">
-                            <button type="submit">Search</button>
-                        </form>
-                    </div>
-
-                    <div class="playlist-grid">
-                        <% artists.forEach(artist => { %>
-                            <% if (artist) { %>
-                                <a href="/artist/<%= artist.id %>" class="playlist-card-link">
-                                    <div class="playlist-card">
-                                        <% if (artist.images && artist.images.length > 0) { %>
-                                            <img src="<%= artist.images[0].url %>" alt="<%= artist.name %>" style="border-radius: 50%;">
-                                        <% } else { %>
-                                            <img src="https://placehold.co/200x200/3A6073/FFFFFF?text=Artist" alt="No Image" style="border-radius: 50%;">
-                                        <% } %>
-                                        <div class="card-text-content" style="text-align: center;">
-                                            <h4><%= artist.name %></h4>
-                                            <p>Artist</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            <% } %>
-                        <% }); %>
-                    </div>
+        <section class="content-area">
+            <!-- Artist Search Header -->
+            <div class="page-header" style="flex-wrap:wrap;gap:16px;">
+                <div>
+                    <h1 style="font-size:1.8rem;font-weight:800;margin:0;">⭐ <%= pageTitle %></h1>
+                    <p style="color:var(--text-muted);margin:6px 0 0;">Discover and follow your favorite artists</p>
                 </div>
-            </section>
-        </main>
-    </div>
+                <form action="/browse/artists" method="GET" style="display:flex;gap:10px;align-items:center;">
+                    <input type="text" name="q" placeholder="Search for an artist..." value="<%= query %>"
+                        style="background:rgba(255,255,255,0.05);border:1px solid var(--border-light);border-radius:10px;padding:10px 16px;color:var(--text-white);font-family:inherit;font-size:0.9rem;outline:none;min-width:220px;">
+                    <button type="submit" class="btn-create" style="padding:10px 20px;">Search</button>
+                </form>
+            </div>
 
-    <script>
-        // Search bar logic (for the main header)
-        const searchInput = document.querySelector('.search-bar input');
-        if (searchInput) {
-            searchInput.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter') {
-                    const query = searchInput.value;
-                    if (query.trim() !== '') {
-                        window.location.href = `/search?q=${encodeURIComponent(query)}`;
-                    }
-                }
-            });
-        }
-
-        // Dropdown logic
-        function toggleDropdown() {
-            const dropdown = document.getElementById("myDropdown");
-            if (dropdown) {
-                dropdown.classList.toggle("show");
-            }
-        }
-        window.onclick = function(event) {
-            if (!event.target.matches('.profile-button, .profile-button *')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    if (dropdowns[i].classList.contains('show')) {
-                        dropdowns[i].classList.remove('show');
-                    }
-                }
-            }
-        }
-    </script>
+            <% if (artists && artists.length > 0) { %>
+            <div class="feed-tracks-grid" style="margin-top:24px;">
+                <% artists.forEach(artist => { %>
+                    <% if (artist) { %>
+                    <a href="/artist/<%= artist.id || artist._id %>" style="text-decoration:none;color:inherit;display:block;">
+                        <div class="feed-track-card" style="text-align:center;">
+                            <div class="feed-track-cover" style="border-radius:50%;overflow:hidden;">
+                                <% if (artist.images && artist.images.length > 0) { %>
+                                    <img src="<%= artist.images[0].url %>" alt="<%= artist.name %>" loading="lazy" onerror="this.src='https://placehold.co/200x200/0f2038/ffd700?text=🎤'" style="border-radius:50%;">
+                                <% } else { %>
+                                    <div style="width:100%;aspect-ratio:1;background:linear-gradient(135deg,var(--gold-glow),var(--bg-surface));display:flex;align-items:center;justify-content:center;font-size:3rem;">🎤</div>
+                                <% } %>
+                                <div class="feed-track-play-overlay" style="border-radius:50%;">
+                                    <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>
+                            <div class="feed-track-info">
+                                <div class="feed-track-name"><%= artist.name %></div>
+                                <div class="feed-track-artist">Artist</div>
+                            </div>
+                        </div>
+                    </a>
+                    <% } %>
+                <% }); %>
+            </div>
+            <% } else { %>
+            <div class="empty-state-card" style="margin-top:40px;">
+                <div class="empty-state-icon">🎤</div>
+                <h3>No Artists Found</h3>
+                <p>Try a different search term or browse all artists.</p>
+                <a href="/browse/artists" class="btn-create">Browse All</a>
+            </div>
+            <% } %>
+        </section>
+    </main>
+</div>
 </body>
 </html>

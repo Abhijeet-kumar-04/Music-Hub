@@ -7,51 +7,88 @@
 </head>
 <body>
 
-  <div class="container">
-    <div class="tab-buttons stagger-item" id="tabButtonsContainer">
-      <button class="tab-button active" onclick="showForm('login')">Login</button>
-      <button class="tab-button" onclick="showForm('signup')">Sign Up</button>
-      <div class="tab-indicator"></div>
+  <!-- Floating background droplets -->
+  <div class="droplet droplet-1"></div>
+  <div class="droplet droplet-2"></div>
+
+  <div class="login-page-wrapper">
+    <!-- Welcome section -->
+    <div class="welcome-section stagger-item">
+      <h1>Welcome to <span class="text-gradient">Music Hub</span></h1>
+      <p class="tagline">Your Soundtrack Awaits</p>
+      <div class="welcome-features">
+        <div class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18V5l12-2v13"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="16" r="3"></circle>
+          </svg>
+          <span>Discover personalized daily recommendations</span>
+        </div>
+        <div class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+          <span>Create, merge, and share premium playlists</span>
+        </div>
+        <div class="feature-item">
+          <svg class="feature-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span>Join as an Artist to publish your own music</span>
+        </div>
+      </div>
     </div>
 
-    <form id="loginForm" action="/login" method="POST">
-      <h2 class="stagger-item">Login</h2>
-      <input type="email" name="email" placeholder="Email Address" class="stagger-item" required />
-      <input type="password" name="password" placeholder="Password" class="stagger-item" required />
-      <div class="role-selector stagger-item">
-        <label class="custom-radio-container">
-          <input type="radio" name="role" value="user" checked>
-          <span class="radio-checkmark"></span>
-          User
-        </label>
-        <label class="custom-radio-container">
-          <input type="radio" name="role" value="artist">
-          <span class="radio-checkmark"></span>
-          Artist
-        </label>
+    <!-- Existing Login card container -->
+    <div class="container">
+      <div class="tab-buttons stagger-item" id="tabButtonsContainer">
+        <button class="tab-button active" onclick="showForm('login')">Login</button>
+        <button class="tab-button" onclick="showForm('signup')">Sign Up</button>
+        <div class="tab-indicator"></div>
       </div>
-      <button type="submit" class="stagger-item">Login</button>
-    </form>
 
-    <form id="signupForm" action="/signup" method="POST" class="hidden">
-      <h2 class="stagger-item">Create Account</h2>
-      <input type="text" name="name" placeholder="Full Name" class="stagger-item" required />
-      <input type="email" name="email" placeholder="Email Address" class="stagger-item" required />
-      <input type="password" name="password" placeholder="Create Password" class="stagger-item" required />
-       <div class="role-selector stagger-item">
-        <label class="custom-radio-container">
-          <input type="radio" name="role" value="user" checked>
-          <span class="radio-checkmark"></span>
-          Sign up as User
-        </label>
-        <label class="custom-radio-container">
-          <input type="radio" name="role" value="artist">
-          <span class="radio-checkmark"></span>
-          Sign up as Artist
-        </label>
-      </div>
-      <button type="submit" class="stagger-item">Sign Up</button>
-    </form>
+      <form id="loginForm" action="/login" method="POST">
+        <h2 class="stagger-item">Login</h2>
+        <input type="email" name="email" placeholder="Email Address" class="stagger-item" required />
+        <input type="password" name="password" placeholder="Password" class="stagger-item" required />
+        <div class="role-selector stagger-item">
+          <label class="custom-radio-container">
+            <input type="radio" name="role" value="user" checked>
+            <span class="radio-checkmark"></span>
+            User
+          </label>
+          <label class="custom-radio-container">
+            <input type="radio" name="role" value="artist">
+            <span class="radio-checkmark"></span>
+            Artist
+          </label>
+        </div>
+        <button type="submit" class="stagger-item">Login</button>
+      </form>
+
+      <form id="signupForm" action="/signup" method="POST" class="hidden">
+        <h2 class="stagger-item">Create Account</h2>
+        <input type="text" name="name" placeholder="Full Name" class="stagger-item" required />
+        <input type="email" name="email" placeholder="Email Address" class="stagger-item" required />
+        <input type="password" name="password" placeholder="Create Password" class="stagger-item" required />
+        <div class="role-selector stagger-item">
+          <label class="custom-radio-container">
+            <input type="radio" name="role" value="user" checked>
+            <span class="radio-checkmark"></span>
+            Sign up as User
+          </label>
+          <label class="custom-radio-container">
+            <input type="radio" name="role" value="artist">
+            <span class="radio-checkmark"></span>
+            Sign up as Artist
+          </label>
+        </div>
+        <button type="submit" class="stagger-item">Sign Up</button>
+      </form>
+    </div>
   </div>
 
   <script src="/js/script1.js"></script>

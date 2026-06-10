@@ -385,8 +385,8 @@ function showToast(msg, type = 'success') {
 window.showToast = showToast;
 
 // ─── Global Add to Playlist Modal Logic ───
-window.userPlaylistsData = <%- JSON.stringify((userPlaylists || []).filter(p => p.name !== 'Liked Songs').map(p => ({ id: p._id, name: p.name }))) %>;
-window.isUserRole = <%= account.role === 'user' ? 'true' : 'false' %>;
+try { window.userPlaylistsData = <%- JSON.stringify((typeof userPlaylists !== 'undefined' && userPlaylists ? userPlaylists : []).filter(p => p.name !== 'Liked Songs').map(p => ({ id: p._id, name: p.name }))) %>; } catch(e) { window.userPlaylistsData = []; }
+window.isUserRole = <%= account.role === 'user' %>;
 
 let atpCurrentTrackData = null;
 
@@ -443,7 +443,8 @@ window.openAddToPlaylistModal = function(trackData) {
 };
 
 window.closeAddToPlaylistModal = function(e) {
-    if (e && e.target !== document.getElementById('atp-modal-overlay')) return;
+    // If called with an event, only close when clicking the backdrop itself (not children)
+    if (e && e.type === 'click' && e.target !== document.getElementById('atp-modal-overlay')) return;
     const modal = document.getElementById('atp-modal-overlay');
     if (modal) {
         modal.classList.remove('active');

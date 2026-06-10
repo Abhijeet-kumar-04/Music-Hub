@@ -1,141 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= categoryName %> Playlists | Music App</title>
-    <link rel="stylesheet" href="/css/style_dashboard.css"> 
-
+    <title><%= categoryName %> Playlists | MusicHub</title>
+    <meta name="description" content="Browse playlists in the <%= categoryName %> category on MusicHub.">
+    <link rel="stylesheet" href="/css/style_dashboard.css">
 </head>
 <body>
-    <div class="dashboard-container">
-        <%- include('partials/sidebar') %>
+<div class="dashboard-container">
+    <%- include('partials/sidebar') %>
+    <main class="main-content">
+        <%- include('partials/header') %>
 
-        <main class="main-content">
-            <%- include('partials/header') %>
-            
-            <section class="content-area">
-                <div class="playlist-section">
-                    <h2><%= categoryName %></h2>
-                    <div class="playlist-grid" id="playlistGrid">
-                        <% playlists.forEach(playlist => { %>
-                            <% if (playlist) { %>
-                                <a href="/playlist/<%= playlist.id %>" class="playlist-card-link">
-                                    <div class="playlist-card">
-                                        <% if (playlist.images && playlist.images.length > 0) { %>
-                                            <img src="<%= playlist.images[0].url %>" alt="<%= playlist.name %> Cover">
-                                        <% } %>
-                                        <div class="card-text-content">
-                                            <h4><%= playlist.name %></h4>
-                                            <p><%- playlist.description %></p>
-                                        </div>
-                                    </div>
-                                </a>
-                            <% } %>
-                        <% }); %>
+        <section class="content-area">
+            <div class="page-header">
+                <h1 style="font-size:1.8rem;font-weight:800;margin:0;">🎵 <%= categoryName %></h1>
+                <p style="color:var(--text-muted);margin:6px 0 0;">Curated playlists for this category</p>
+            </div>
+
+            <div class="playlist-grid" id="playlistGrid" style="margin-top:24px;">
+                <% if (playlists && playlists.length > 0) { %>
+                    <% playlists.forEach(playlist => { %>
+                        <% if (playlist) { %>
+                        <div class="playlist-card">
+                            <a href="/playlist/<%= playlist.id %>" style="text-decoration:none;color:inherit;display:block;flex-grow:1;">
+                                <% if (playlist.images && playlist.images.length > 0) { %>
+                                    <img src="<%= playlist.images[0].url %>" alt="<%= playlist.name %> Cover" onerror="this.src='https://placehold.co/300x300/0f2038/ffd700?text=♪'">
+                                <% } else { %>
+                                    <div style="width:100%;aspect-ratio:1;background:var(--bg-surface);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:2rem;">🎵</div>
+                                <% } %>
+                                <h4><%= playlist.name %></h4>
+                                <p><%= playlist.description || 'No description' %></p>
+                            </a>
+                        </div>
+                        <% } %>
+                    <% }); %>
+                <% } else { %>
+                    <div class="empty-state-card" style="grid-column:1/-1;">
+                        <div class="empty-state-icon">🎵</div>
+                        <h3>No Playlists Found</h3>
+                        <p>No playlists available for this category yet.</p>
+                        <a href="javascript:history.back()" class="btn-create">← Go Back</a>
                     </div>
-                </div>
-                <!-- NEW: Load More Button -->
-                <div class="load-more-container">
-                    <button id="loadMoreBtn">Load More</button>
-                </div>
-            </section>
-        </main>
-    </div>
+                <% } %>
+            </div>
 
-    <!-- NEW: JavaScript for Load More functionality -->
-    <script>
-        // Dropdown menu logic
-        function toggleDropdown() {
-            document.getElementById("myDropdown").classList.toggle("show");
-        }
-        window.onclick = function(event) {
-            if (!event.target.matches('.profile-button, .profile-button *')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    if (dropdowns[i].classList.contains('show')) {
-                        dropdowns[i].classList.remove('show');
-                    }
-                }
+            <!-- Load More -->
+            <div class="load-more-container" id="load-more-wrap" style="display:<%= playlists && playlists.length >= 20 ? 'flex' : 'none' %>;">
+                <button id="loadMoreBtn" onclick="loadMorePlaylists()">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+                    Load More
+                </button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+let categoryOffset = 20;
+const categoryId = window.location.pathname.split('/').pop();
+
+async function loadMorePlaylists() {
+    const btn = document.getElementById('loadMoreBtn');
+    btn.disabled = true;
+    btn.textContent = 'Loading…';
+    try {
+        const res = await fetch(`/api/category/${categoryId}/playlists?offset=${categoryOffset}`);
+        const newPlaylists = await res.json();
+        const grid = document.getElementById('playlistGrid');
+
+        if (newPlaylists && newPlaylists.length > 0) {
+            newPlaylists.forEach(playlist => {
+                if (!playlist) return;
+                const imgHtml = playlist.images && playlist.images.length > 0
+                    ? `<img src="${playlist.images[0].url}" alt="${playlist.name}" onerror="this.src='https://placehold.co/300x300/0f2038/ffd700?text=♪'">`
+                    : `<div style="width:100%;aspect-ratio:1;background:var(--bg-surface);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:2rem;">🎵</div>`;
+                const card = document.createElement('div');
+                card.className = 'playlist-card';
+                card.innerHTML = `<a href="/playlist/${playlist.id}" style="text-decoration:none;color:inherit;display:block;flex-grow:1;">
+                    ${imgHtml}
+                    <h4>${playlist.name}</h4>
+                    <p>${playlist.description || 'No description'}</p>
+                </a>`;
+                grid.appendChild(card);
+            });
+            categoryOffset += 20;
+            btn.textContent = 'Load More';
+            btn.disabled = false;
+            if (newPlaylists.length < 20) {
+                btn.textContent = 'All Playlists Loaded';
+                btn.disabled = true;
             }
+        } else {
+            btn.textContent = 'All Playlists Loaded';
+            btn.disabled = true;
         }
-
-        // Load More logic
-        const loadMoreBtn = document.getElementById('loadMoreBtn');
-        const playlistGrid = document.getElementById('playlistGrid');
-        let currentOffset = 20; // We already loaded the first 20 items
-
-        loadMoreBtn.addEventListener('click', async () => {
-            // Get the category ID from the current URL
-            const urlParts = window.location.pathname.split('/');
-            const categoryId = urlParts[urlParts.length - 1];
-
-            // Fetch the next set of playlists from our new API route
-            const response = await fetch(`/api/category/${categoryId}/playlists?offset=${currentOffset}`);
-            const newPlaylists = await response.json();
-
-            if (newPlaylists && newPlaylists.length > 0) {
-                newPlaylists.forEach(playlist => {
-                    if (playlist) {
-                        // Create the new card element dynamically
-                        const cardLink = document.createElement('a');
-                        cardLink.href = `/playlist/${playlist.id}`;
-                        cardLink.className = 'playlist-card-link';
-
-                        let imageHtml = '';
-                        if (playlist.images && playlist.images.length > 0) {
-                            imageHtml = `<img src="${playlist.images[0].url}" alt="${playlist.name} Cover">`;
-                        }
-
-                        cardLink.innerHTML = `
-                            <div class="playlist-card">
-                                ${imageHtml}
-                                <div class="card-text-content">
-                                    <h4>${playlist.name}</h4>
-                                    <p>${playlist.description}</p>
-                                </div>
-                            </div>
-                        `;
-                        playlistGrid.appendChild(cardLink);
-                    }
-                });
-                // Increase the offset for the next click
-                currentOffset += 20;
-            } else {
-                // If no more playlists are returned, hide the button
-                loadMoreBtn.textContent = 'No More Playlists';
-                loadMoreBtn.disabled = true;
-            }
-        });
-    </script>
-
-    <!-- search baar  -->
-    <script>
-        // Search bar logic
-        const searchInput = document.querySelector('.search-bar input');
-        searchInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                const query = searchInput.value;
-                if (query.trim() !== '') {
-                    window.location.href = `/search?q=${encodeURIComponent(query)}`;
-                }
-            }
-        });
-
-        // Dropdown logic
-        function toggleDropdown() {
-            document.getElementById("myDropdown").classList.toggle("show");
-        }
-        window.onclick = function(event) {
-            if (!event.target.matches('.profile-button, .profile-button *')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    if (dropdowns[i].classList.contains('show')) {
-                        dropdowns[i].classList.remove('show');
-                    }
-                }
-            }
-        }
-    </script>
+    } catch (err) {
+        console.error('Load more playlists failed:', err);
+        btn.textContent = 'Load More';
+        btn.disabled = false;
+    }
+}
+</script>
 </body>
 </html>
