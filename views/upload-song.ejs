@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Song | Music App</title>
+    <link rel="stylesheet" href="/css/style_dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <%- include('partials/sidebar') %>
+        <main class="main-content">
+            <%- include('partials/header') %>
+            
+            <section class="content-area">
+                <div class="premium-form-container">
+                    <h2 style="font-size: 1.8rem; margin-top: 0; margin-bottom: 25px; color: var(--gold-primary); border-bottom: 1px solid var(--border-gold); padding-bottom: 10px;">Upload New Track</h2>
+                    <form action="/songs/upload" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="title">Song Title *</label>
+                            <input type="text" id="title" name="title" placeholder="Enter song title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="album">Album Name</label>
+                            <input type="text" id="album" name="album" placeholder="Enter album name (default: Single)">
+                        </div>
+                        <div class="form-group">
+                            <label for="audio">Audio File (.mp3) *</label>
+                            <input type="file" id="audio" name="audio" accept="audio/mp3" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cover">Album Cover Art</label>
+                            <input type="file" id="cover" name="cover" accept="image/*">
+                        </div>
+                        <button type="submit" class="premium-btn" style="margin-top: 10px;">Publish Song</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

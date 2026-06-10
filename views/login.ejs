@@ -1,0 +1,60 @@
+<!-- filepath: c:\Users\abhij\OneDrive\Desktop\creativity\music_full\views\login.ejs -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <link rel="stylesheet" href="/css/style1.css">
+</head>
+<body>
+
+  <div class="container">
+    <div class="tab-buttons stagger-item" id="tabButtonsContainer">
+      <button class="tab-button active" onclick="showForm('login')">Login</button>
+      <button class="tab-button" onclick="showForm('signup')">Sign Up</button>
+      <div class="tab-indicator"></div>
+    </div>
+
+    <form id="loginForm" action="/login" method="POST">
+      <h2 class="stagger-item">Login</h2>
+      <input type="email" name="email" placeholder="Email Address" class="stagger-item" required />
+      <input type="password" name="password" placeholder="Password" class="stagger-item" required />
+      <div class="role-selector stagger-item">
+        <label class="custom-radio-container">
+          <input type="radio" name="role" value="user" checked>
+          <span class="radio-checkmark"></span>
+          User
+        </label>
+        <label class="custom-radio-container">
+          <input type="radio" name="role" value="artist">
+          <span class="radio-checkmark"></span>
+          Artist
+        </label>
+      </div>
+      <button type="submit" class="stagger-item">Login</button>
+    </form>
+
+    <form id="signupForm" action="/signup" method="POST" class="hidden">
+      <h2 class="stagger-item">Create Account</h2>
+      <input type="text" name="name" placeholder="Full Name" class="stagger-item" required />
+      <input type="email" name="email" placeholder="Email Address" class="stagger-item" required />
+      <input type="password" name="password" placeholder="Create Password" class="stagger-item" required />
+       <div class="role-selector stagger-item">
+        <label class="custom-radio-container">
+          <input type="radio" name="role" value="user" checked>
+          <span class="radio-checkmark"></span>
+          Sign up as User
+        </label>
+        <label class="custom-radio-container">
+          <input type="radio" name="role" value="artist">
+          <span class="radio-checkmark"></span>
+          Sign up as Artist
+        </label>
+      </div>
+      <button type="submit" class="stagger-item">Sign Up</button>
+    </form>
+  </div>
+
+  <script src="/js/script1.js"></script>
+
+</body>
+</html>

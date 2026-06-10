@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Music Player Test</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .player-container {
+            border: 1px solid #333;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        img {
+            width: 200px;
+            height: 200px;
+            border-radius: 8px;
+        }
+        button {
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="player-container">
+        <h1>Player Test</h1>
+        <% if (track) { %>
+            <img src="<%= track.album.images[0].url %>" alt="Album Art">
+            <h2><%= track.name %></h2>
+            <p><%= track.artists[0].name %></p>
+            
+            <!-- Hum preview URL ko button ke data attribute mein store kar rahe hain -->
+            <button id="playButton" data-preview-url="<%= track.preview_url %>">
+                Play Preview
+            </button>
+            <p id="status">Click to play</p>
+        <% } else { %>
+            <p>Could not find the test track.</p>
+        <% } %>
+    </div>
+
+    <audio id="audioPlayer"></audio>
+
+    <script>
+        const playButton = document.getElementById('playButton');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const status = document.getElementById('status');
+
+        playButton.addEventListener('click', () => {
+            const previewUrl = playButton.dataset.previewUrl;
+            
+            console.log("Button clicked!");
+            console.log("Preview URL mila:", previewUrl);
+
+            if (!previewUrl || previewUrl === 'null') {
+                status.textContent = "Sorry, is gaane ka preview nahi hai.";
+                console.error("Preview URL nahi mila!");
+                return;
+            }
+
+            try {
+                // Check if the song is currently paused or has ended
+                if (audioPlayer.paused) {
+                    console.log("Audio paused hai. Play kar rahe hain...");
+                    audioPlayer.src = previewUrl;
+                    audioPlayer.play();
+                    status.textContent = "Playing...";
+                    playButton.textContent = "Pause";
+                } else {
+                    console.log("Audio chal raha hai. Pause kar rahe hain...");
+                    audioPlayer.pause();
+                    status.textContent = "Paused.";
+                    playButton.textContent = "Play Preview";
+                }
+            } catch (error) {
+                console.error("Gaana play karne mein error aaya:", error);
+                status.textContent = "Error playing audio. Check console.";
+            }
+        });
+
+        // Jab gaana khatm ho jaye, toh button ko reset karein
+        audioPlayer.addEventListener('ended', () => {
+            console.log("Gaana khatm ho gaya.");
+            status.textContent = "Preview ended. Click to play again.";
+            playButton.textContent = "Play Preview";
+        });
+    </script>
+</body>
+</html>

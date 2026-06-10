@@ -1,0 +1,20 @@
+<!-- filepath: c:\Users\abhij\OneDrive\Desktop\creativity\music_full\views\userProfile.ejs -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Profile</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <h2>User Profile</h2>
+  <p>Name: <%= user.name %></p>
+  <p>Email: <%= user.email %></p>
+  <h3>Playlists</h3>
+  <ul>
+    <% user.playlists.forEach(playlist => { %>
+      <li><%= playlist.name %></li>
+    <% }) %>
+  </ul>
+  <a href="/dashboard">Back to Dashboard</a>
+</body>
+</html>

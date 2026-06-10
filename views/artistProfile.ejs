@@ -1,0 +1,21 @@
+<!-- filepath: c:\Users\abhij\OneDrive\Desktop\creativity\music_full\views\artistProfile.ejs -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Artist Profile</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <h2>Artist Profile</h2>
+  <p>Name: <%= artist.name %></p>
+  <p>Email: <%= artist.email %></p>
+  <p>Bio: <%= artist.bio %></p>
+  <h3>Songs</h3>
+  <ul>
+    <% artist.songs.forEach(song => { %>
+      <li><%= song.title %></li>
+    <% }) %>
+  </ul>
+  <a href="/dashboard">Back to Dashboard</a>
+</body>
+</html>

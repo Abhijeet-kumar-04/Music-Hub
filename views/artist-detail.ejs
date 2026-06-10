@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= artist.name %> | MusicHub</title>
+    <link rel="stylesheet" href="/css/style_dashboard.css">
+</head>
+<body>
+<div class="dashboard-container">
+    <%- include('partials/sidebar') %>
+    <main class="main-content">
+        <%- include('partials/header') %>
+
+        <!-- ── Artist Hero ─────────────────────────────────────────────── -->
+        <div class="artist-hero">
+            <div class="artist-hero-bg"></div>
+            <div class="artist-hero-content">
+                <div class="artist-avatar-xl">
+                    <% if (artist.images && artist.images.length > 0) { %>
+                        <img src="<%= artist.images[0].url %>" alt="<%= artist.name %>">
+                    <% } else { %>
+                        <div class="artist-avatar-placeholder"><%= artist.name.charAt(0).toUpperCase() %></div>
+                    <% } %>
+                </div>
+                <div class="artist-hero-info">
+                    <span class="artist-badge">ARTIST</span>
+                    <h1 class="artist-hero-name"><%= artist.name %></h1>
+                    <div class="artist-stats-row">
+                        <div class="artist-stat">
+                            <span class="stat-value" id="followers-count">
+                                <%= (artist.followers && artist.followers.length) ? artist.followers.length.toLocaleString() : '0' %>
+                            </span>
+                            <span class="stat-label">Followers</span>
+                        </div>
+                        <div class="artist-stat-sep">·</div>
+                        <div class="artist-stat">
+                            <span class="stat-value" id="listeners-count">
+                                <%
+                                    const followersLen = artist.followers ? artist.followers.length : 0;
+                                    const monthlyEstimate = followersLen * 15 + 120;
+                                %>
+                                <%= monthlyEstimate.toLocaleString() %>
+                            </span>
+                            <span class="stat-label">Monthly Listeners</span>
+                        </div>
+                        <div class="artist-stat-sep">·</div>
+                        <div class="artist-stat">
+                            <span class="stat-value"><%= tracks ? tracks.length : 0 %></span>
+                            <span class="stat-label">Songs</span>
+                        </div>
+                    </div>
+                    <% if (account.role === 'user') { %>
+                    <% const isFollowing = artist.followers && artist.followers.some(f => f.toString() === account._id.toString()); %>
+                    <button id="follow-btn"
+                            class="follow-btn <%= isFollowing ? 'following' : '' %>"
+                            onclick="toggleFollow('<%= artist._id %>')">
+                        <%= isFollowing ? '✓ Following' : '+ Follow' %>
+                    </button>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Content Area ───────────────────────────────────────────── -->
+        <div class="content-area" style="padding-top:0;">
+
+            <!-- Popular Tracks -->
+            <div class="feed-section">
+                <div class="section-header">
+                    <h2 class="section-title">Popular Tracks</h2>
+                </div>
+                <% if (tracks && tracks.length > 0) { %>
+                    <!-- Set queue for skip prev/next -->
+                    <script>
+                        window.trackQueue = <%- JSON.stringify(tracks.map(t => ({
+                            id: t.id,
+                            name: t.name,
+                            artist: (t.artists ? t.artists.map(a=>a.name).join(', ') : artist.name),
+                            coverUrl: (t.album && t.album.images && t.album.images[0]) ? t.album.images[0].url : '',
+                            audioUrl: t.audioUrl || '',
+                            isLocal: t.isLocal || false
+                        }))).replace(/</g, '\\u003c') %>;
+                        window.trackQueueIndex = -1;
+                    </script>
+                    <table class="song-table">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">#</th>
+                                <th>Title</th>
+                                <th>Album</th>
+                                <th style="width:80px;text-align:center;">Likes</th>
+                                <th style="text-align:right;width:260px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% tracks.forEach((track, index) => { %>
+                            <% if (track) { %>
+                                <% const trackId = track.id || track._id; %>
+                                <tr data-track-id="<%= trackId %>">
+                                    <td style="width:50px;">
+                                        <span class="song-index-num"><%= index + 1 %></span>
+                                        <div class="song-play-wave playing-wave-container">
+                                            <div class="playing-wave-bar"></div>
+                                            <div class="playing-wave-bar"></div>
+                                            <div class="playing-wave-bar"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="song-title-cell">
+                                            <img src="<%= track.album?.images[2]?.url || track.album?.images[0]?.url || 'https://placehold.co/44x44/0f2038/ffd700?text=♪' %>" alt="Cover">
+                                            <div>
+                                                <div class="song-title"><%= track.name %></div>
+                                                <div class="song-artist"><%= track.artists?.map(a => a.name).join(', ') || artist.name %></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><%= track.album?.name || 'Single' %></td>
+                                    <td style="text-align:center;">
+                                        <span class="like-count-badge"><%= track.likeCount || 0 %></span>
+                                    </td>
+                                    <td class="actions-cell">
+                                        <button class="play-row-btn" onclick="(()=>{window.trackQueueIndex=<%= index %>;playTrack({
+                                            id: '<%= trackId %>',
+                                            name: '<%= track.name.replace(/'/g, "\\'") %>',
+                                            artist: '<%= (track.artists?.map(a => a.name).join(', ') || artist.name).replace(/'/g, "\\'") %>',
+                                            coverUrl: '<%= track.album?.images[0]?.url || "" %>',
+                                            audioUrl: '<%= track.audioUrl || "" %>',
+                                            isLocal: <%= track.isLocal ? 'true' : 'false' %>
+                                        });})()">▶ Play</button>
+                                        <% if (account.role === 'user') { %>
+                                        <button class="like-row-btn" onclick="toggleLikeSong(this, {
+                                            songId: '<%= track.isLocal ? trackId : '' %>',
+                                            spotifyId: '<%= !track.isLocal ? trackId : '' %>',
+                                            title: '<%= track.name.replace(/'/g, "\\'") %>',
+                                            artist: '<%= (track.artists?.map(a => a.name).join(', ') || artist.name).replace(/'/g, "\\'") %>',
+                                            album: '<%= (track.album?.name || '').replace(/'/g, "\\'") %>',
+                                            coverUrl: '<%= track.album?.images[0]?.url || '' %>',
+                                            isLocal: <%= track.isLocal ? 'true' : 'false' %>
+                                        })">
+                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                        </button>
+                                        <!-- Add to other playlist button -->
+                                        <button class="add-playlist-btn" onclick="openAddToPlaylistModal({
+                                            songId: '<%= track.isLocal ? trackId : "" %>',
+                                            spotifyId: '<%= !track.isLocal ? trackId : "" %>',
+                                            title: '<%= track.name.replace(/'/g, "\\'") %>',
+                                            artist: '<%= (track.artists?.map(a => a.name).join(", ") || artist.name).replace(/'/g, "\\'") %>',
+                                            album: '<%= (track.album?.name || "").replace(/'/g, "\\'") %>',
+                                            coverUrl: '<%= track.album?.images[0]?.url || "" %>',
+                                            isLocal: <%= track.isLocal ? 'true' : 'false' %>
+                                        })">+ Add</button>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% } %>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <div class="empty-state-card">
+                        <div class="empty-state-icon">🎵</div>
+                        <h3>No Tracks Yet</h3>
+                        <p>This artist hasn't uploaded any songs yet.</p>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Albums Section -->
+            <% if (albums && albums.length > 0) { %>
+            <div class="feed-section">
+                <div class="section-header">
+                    <h2 class="section-title">Albums & Singles</h2>
+                </div>
+                <div class="feed-tracks-grid" id="albumGrid">
+                    <% albums.forEach(album => { %>
+                    <a href="/album/<%= album.id || 'local_album' %>" class="feed-track-card-link" style="text-decoration:none;color:inherit;display:block;">
+                        <div class="feed-track-card">
+                            <div class="feed-track-cover">
+                                <img src="<%= album.images[1]?.url || album.images[0]?.url || 'https://placehold.co/200x200/0f2038/ffd700?text=♪' %>" alt="<%= album.name %>" loading="lazy">
+                            </div>
+                            <div class="feed-track-info">
+                                <div class="feed-track-name"><%= album.name %></div>
+                                <div class="feed-track-artist"><%= album.release_date?.substring(0, 4) || '' %> · <%= album.album_type || 'Album' %></div>
+                            </div>
+                        </div>
+                    </a>
+                    <% }); %>
+                </div>
+                <% if (albums.length >= 10) { %>
+                <div style="text-align:center;margin-top:20px;">
+                    <button id="loadMoreBtn" class="btn-load-more">Load More Albums</button>
+                </div>
+                <% } %>
+            </div>
+            <% } %>
+        </div>
+    </main>
+</div>
+
+<script>
+// ─── Follow Toggle ────────────────────────────────────────────────────────
+async function toggleFollow(artistId) {
+    const btn = document.getElementById('follow-btn');
+    if (!btn) return;
+    btn.disabled = true;
+    try {
+        const res = await fetch(`/artist/${artistId}/follow`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+        const data = await res.json();
+        if (res.ok) {
+            btn.classList.toggle('following', data.following);
+            btn.textContent = data.following ? '✓ Following' : '+ Follow';
+            const follEl = document.getElementById('followers-count');
+            const lisEl = document.getElementById('listeners-count');
+            if (follEl) follEl.textContent = (data.followersCount || 0).toLocaleString();
+            if (lisEl) lisEl.textContent = (data.monthlyListeners || 0).toLocaleString();
+            showToast(data.following ? '✅ Now following!' : 'Unfollowed.');
+        } else {
+            showToast(data.error || 'Error', 'error');
+        }
+    } catch (err) {
+        showToast('Network error', 'error');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+// ─── Load More Albums ─────────────────────────────────────────────────────
+const loadMoreBtn = document.getElementById('loadMoreBtn');
+const albumGrid = document.getElementById('albumGrid');
+let currentOffset = 10;
+if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', async () => {
+        const artistId = window.location.pathname.split('/').pop();
+        try {
+            loadMoreBtn.textContent = 'Loading…';
+            const response = await fetch(`/api/artist/${artistId}/albums?offset=${currentOffset}`);
+            const newAlbums = await response.json();
+            if (newAlbums && newAlbums.length > 0) {
+                newAlbums.forEach(album => {
+                    const card = document.createElement('a');
+                    card.href = `/album/${album.id || 'local_album'}`;
+                    card.className = 'feed-track-card-link';
+                    card.style.textDecoration = 'none';
+                    card.style.color = 'inherit';
+                    card.style.display = 'block';
+                    const imgUrl = album.images[1]?.url || album.images[0]?.url || 'https://placehold.co/200x200/0f2038/ffd700?text=♪';
+                    card.innerHTML = `<div class="feed-track-card"><div class="feed-track-cover"><img src="${imgUrl}" alt="${album.name}" loading="lazy"></div><div class="feed-track-info"><div class="feed-track-name">${album.name}</div><div class="feed-track-artist">${album.release_date?.substring(0,4)||''}</div></div></div>`;
+                    albumGrid.appendChild(card);
+                });
+                currentOffset += 10;
+                loadMoreBtn.textContent = 'Load More Albums';
+            } else {
+                loadMoreBtn.textContent = 'No More Albums';
+                loadMoreBtn.disabled = true;
+            }
+        } catch (err) { console.error(err); loadMoreBtn.textContent = 'Error loading'; }
+    });
+}
+</script>
+</body>
+</html>

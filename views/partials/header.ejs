@@ -1,0 +1,618 @@
+<!-- Main Header -->
+<header class="main-header">
+    <div class="header-logo">
+        <a href="/<%= account.role %>/<%= encodeURIComponent(account.name) %>/dashboard">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="#ffd700" stroke-width="2"/>
+                <path d="M9.5 16V8L16.5 12L9.5 16Z" fill="#ffd700"/>
+            </svg>
+            <span style="color:#fff;font-weight:800;letter-spacing:-0.5px;">Music<span style="color:var(--gold-primary);">Hub</span></span>
+        </a>
+    </div>
+    
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="header-search-input" placeholder="Search songs, artists, albums..." value="<%= typeof query !== 'undefined' ? query : '' %>">
+    </div>
+    
+    <!-- User Profile -->
+    <div class="user-profile">
+        <button onclick="toggleDropdown()" class="profile-button" id="profile-btn">
+            <div class="profile-pic"><%= account.name.charAt(0).toUpperCase() %></div>
+            <span><%= account.name %></span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div id="myDropdown" class="dropdown-content">
+            <!-- Dark/Light Mode Toggle -->
+            <div class="dropdown-theme-row">
+                <span class="dropdown-theme-label">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="theme-icon-moon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="theme-icon-sun" class="hidden"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <span id="theme-label-text">Dark Mode</span>
+                </span>
+                <label class="theme-toggle-switch">
+                    <input type="checkbox" id="theme-toggle-cb" onchange="toggleTheme()">
+                    <span class="theme-slider"></span>
+                </label>
+            </div>
+            <div class="dropdown-divider"></div>
+            <% if (account.role === 'artist') { %>
+                <a href="/my-songs">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    My Songs
+                </a>
+            <% } %>
+            <a href="/profile">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Profile
+            </a>
+            <a href="/support">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Support
+            </a>
+            <a href="/logout" class="dropdown-logout">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Log Out
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ─── Global Player Bar ──────────────────────────────────────────────────── -->
+<div id="global-player-bar" class="player-bar-container">
+    <div class="player-track-info">
+        <img id="player-cover" src="https://placehold.co/50x50/0f2038/FFFFFF?text=♪" alt="Cover">
+        <div class="player-text">
+            <div id="player-title" class="player-title">No Track Selected</div>
+            <div id="player-artist" class="player-artist">Pick a song to start</div>
+        </div>
+        <!-- Like button in player -->
+        <button id="player-like-btn" class="player-like-btn" onclick="togglePlayerLike()" title="Like this track">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </button>
+    </div>
+
+    <!-- Controls -->
+    <div id="local-player-controls" class="player-controls">
+        <div class="control-buttons">
+            <button class="control-btn" onclick="skipPrevious()" title="Previous">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+            </button>
+            <button id="player-play-btn" class="control-btn play-btn" onclick="toggleLocalPlayback()">
+                <svg id="play-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <svg id="pause-icon" class="hidden" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+            <button class="control-btn" onclick="skipNext()" title="Next">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2-8.14 5.02 2.64L8 15.64V9.86zM16 6h2v12h-2z"/></svg>
+            </button>
+        </div>
+        <div class="progress-container">
+            <span id="player-current-time">0:00</span>
+            <input type="range" id="player-progress" class="progress-slider" min="0" max="100" value="0" oninput="seekLocalAudio(this.value)">
+            <span id="player-duration">0:00</span>
+        </div>
+    </div>
+
+    <div id="spotify-player-container" class="spotify-player-container hidden"></div>
+
+    <div id="local-volume-container" class="player-volume">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        <input type="range" id="player-volume" class="volume-slider" min="0" max="100" value="70" oninput="adjustLocalVolume(this.value)">
+    </div>
+</div>
+
+<audio id="global-audio-element" ontimeupdate="onLocalTimeUpdate()" onloadedmetadata="onLocalMetadataLoaded()" onended="onLocalAudioEnded()"></audio>
+
+<script>
+// ─── Search Bar ────────────────────────────────────────────────────────────
+const searchInputEl = document.getElementById('header-search-input');
+if (searchInputEl) {
+    searchInputEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const q = searchInputEl.value.trim();
+            if (q) window.location.href = `/search?q=${encodeURIComponent(q)}`;
+        }
+    });
+}
+
+// ─── Theme Toggle ─────────────────────────────────────────────────────────
+(function applyStoredTheme() {
+    const stored = localStorage.getItem('mh-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', stored);
+    const cb = document.getElementById('theme-toggle-cb');
+    const labelText = document.getElementById('theme-label-text');
+    const moonIcon = document.getElementById('theme-icon-moon');
+    const sunIcon = document.getElementById('theme-icon-sun');
+    if (stored === 'light') {
+        if (cb) cb.checked = true;
+        if (labelText) labelText.textContent = 'Light Mode';
+        if (moonIcon) moonIcon.classList.add('hidden');
+        if (sunIcon) sunIcon.classList.remove('hidden');
+    } else {
+        if (cb) cb.checked = false;
+        if (labelText) labelText.textContent = 'Dark Mode';
+        if (moonIcon) moonIcon.classList.remove('hidden');
+        if (sunIcon) sunIcon.classList.add('hidden');
+    }
+})();
+
+function toggleTheme() {
+    const cb = document.getElementById('theme-toggle-cb');
+    const labelText = document.getElementById('theme-label-text');
+    const moonIcon = document.getElementById('theme-icon-moon');
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const isLight = cb && cb.checked;
+    const theme = isLight ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('mh-theme', theme);
+    if (isLight) {
+        if (labelText) labelText.textContent = 'Light Mode';
+        if (moonIcon) moonIcon.classList.add('hidden');
+        if (sunIcon) sunIcon.classList.remove('hidden');
+    } else {
+        if (labelText) labelText.textContent = 'Dark Mode';
+        if (moonIcon) moonIcon.classList.remove('hidden');
+        if (sunIcon) sunIcon.classList.add('hidden');
+    }
+}
+
+// ─── Dropdown ─────────────────────────────────────────────────────────────
+function toggleDropdown() {
+    document.getElementById('myDropdown').classList.toggle('show');
+}
+window.addEventListener('click', (e) => {
+    if (!e.target.closest('#profile-btn')) {
+        const dd = document.getElementById('myDropdown');
+        if (dd) dd.classList.remove('show');
+    }
+});
+
+// ─── Global Music Player ──────────────────────────────────────────────────
+const audio = document.getElementById('global-audio-element');
+const playIcon = document.getElementById('play-icon');
+const pauseIcon = document.getElementById('pause-icon');
+const currentTimeText = document.getElementById('player-current-time');
+const durationText = document.getElementById('player-duration');
+const progressSlider = document.getElementById('player-progress');
+const volumeSlider = document.getElementById('player-volume');
+
+window.currentPlayingTrackId = null;
+window.currentTrackData = null;
+window.trackQueue = [];
+window.trackQueueIndex = -1;
+
+function updateSliderFill(slider, pct) {
+    slider.style.background = `linear-gradient(to right, #ffd700 ${pct}%, #3e4a5d ${pct}%)`;
+}
+if (volumeSlider) updateSliderFill(volumeSlider, 70);
+
+window.updatePlayingRowStates = function() {
+    document.querySelectorAll('tr[data-track-id]').forEach(row => {
+        const isActive = row.getAttribute('data-track-id') === window.currentPlayingTrackId;
+        row.classList.toggle('is-playing', isActive);
+        const btn = row.querySelector('.play-row-btn');
+        if (btn) {
+            btn.textContent = isActive && !audio.paused ? '▐▐' : '▶';
+        }
+    });
+};
+
+window.playTrack = function(track) {
+    const localControls = document.getElementById('local-player-controls');
+    const spotifyContainer = document.getElementById('spotify-player-container');
+    const volumeContainer = document.getElementById('local-volume-container');
+    const playBar = document.getElementById('global-player-bar');
+
+    window.currentPlayingTrackId = track.id || track.spotifyId || track.audioUrl;
+    window.currentTrackData = track;
+    playBar.classList.add('active');
+
+    document.getElementById('player-title').textContent = track.name || 'Unknown';
+    document.getElementById('player-artist').textContent = track.artist || '';
+    document.getElementById('player-cover').src = track.coverUrl || 'https://placehold.co/50x50/0f2038/ffd700?text=♪';
+
+    audio.pause();
+
+    if (track.audioUrl && track.audioUrl !== 'null' && track.audioUrl !== '') {
+        localControls.classList.remove('hidden');
+        volumeContainer.classList.remove('hidden');
+        spotifyContainer.classList.add('hidden');
+        spotifyContainer.innerHTML = '';
+        audio.src = track.audioUrl;
+        audio.load();
+        audio.play().then(() => {
+            updatePlayButtonState(true);
+            window.updatePlayingRowStates();
+        }).catch(err => console.error('Play error:', err));
+    } else if (track.spotifyId) {
+        localControls.classList.add('hidden');
+        volumeContainer.classList.add('hidden');
+        spotifyContainer.classList.remove('hidden');
+        spotifyContainer.innerHTML = `<iframe style="border-radius:12px;border:none;" src="https://open.spotify.com/embed/track/${track.spotifyId}?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+        window.updatePlayingRowStates();
+    }
+};
+
+function updatePlayButtonState(isPlaying) {
+    if (playIcon && pauseIcon) {
+        playIcon.classList.toggle('hidden', isPlaying);
+        pauseIcon.classList.toggle('hidden', !isPlaying);
+    }
+}
+
+function toggleLocalPlayback() {
+    if (audio.paused) { audio.play(); updatePlayButtonState(true); }
+    else { audio.pause(); updatePlayButtonState(false); }
+    window.updatePlayingRowStates();
+}
+
+function skipPrevious() {
+    if (window.trackQueueIndex > 0) {
+        window.trackQueueIndex--;
+        window.playTrack(window.trackQueue[window.trackQueueIndex]);
+    }
+}
+function skipNext() {
+    if (window.trackQueueIndex < window.trackQueue.length - 1) {
+        window.trackQueueIndex++;
+        window.playTrack(window.trackQueue[window.trackQueueIndex]);
+    }
+}
+
+function seekLocalAudio(value) {
+    if (audio.duration) {
+        audio.currentTime = (value / 100) * audio.duration;
+        updateSliderFill(progressSlider, value);
+    }
+}
+function adjustLocalVolume(value) {
+    audio.volume = value / 100;
+    updateSliderFill(volumeSlider, value);
+}
+function formatTime(s) {
+    if (isNaN(s)) return '0:00';
+    return `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;
+}
+function onLocalTimeUpdate() {
+    if (audio.duration) {
+        const pct = (audio.currentTime / audio.duration) * 100;
+        progressSlider.value = pct;
+        updateSliderFill(progressSlider, pct);
+        currentTimeText.textContent = formatTime(audio.currentTime);
+    }
+}
+function onLocalMetadataLoaded() {
+    durationText.textContent = formatTime(audio.duration);
+    progressSlider.value = 0;
+    updateSliderFill(progressSlider, 0);
+}
+function onLocalAudioEnded() {
+    updatePlayButtonState(false);
+    progressSlider.value = 0;
+    updateSliderFill(progressSlider, 0);
+    currentTimeText.textContent = '0:00';
+    window.updatePlayingRowStates();
+    // Auto-advance queue
+    skipNext();
+}
+
+// ─── Player Like Button ───────────────────────────────────────────────────
+window.togglePlayerLike = async function() {
+    if (!window.currentTrackData) return;
+    const track = window.currentTrackData;
+    try {
+        const res = await fetch('/playlists/like-song', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                songId: track.isLocal ? track.id : '',
+                spotifyId: !track.isLocal ? (track.spotifyId || track.id) : '',
+                title: track.name,
+                artist: track.artist,
+                isLocal: track.isLocal || false
+            })
+        });
+        const data = await res.json();
+        const likeBtn = document.getElementById('player-like-btn');
+        if (likeBtn) {
+            likeBtn.style.color = data.liked ? 'var(--gold-primary)' : '';
+            likeBtn.querySelector('svg').setAttribute('fill', data.liked ? 'var(--gold-primary)' : 'none');
+        }
+        showToast(data.liked ? '❤️ Added to Liked Songs' : '💔 Removed from Liked Songs');
+    } catch(err) { console.error(err); }
+};
+
+// ─── Playlist / Like Utilities ────────────────────────────────────────────
+window.togglePlaylistDropdown = function(btn) {
+    document.querySelectorAll('.playlist-options-content').forEach(d => {
+        if (d !== btn.nextElementSibling) d.classList.remove('show');
+    });
+    btn.nextElementSibling.classList.toggle('show');
+};
+window.addEventListener('click', function(e) {
+    if (!e.target.matches('.add-playlist-btn')) {
+        document.querySelectorAll('.playlist-options-content').forEach(d => d.classList.remove('show'));
+    }
+});
+
+window.addToPlaylist = async function(playlistId, trackData) {
+    try {
+        const res = await fetch(`/playlists/${playlistId}/add-song`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(trackData)
+        });
+        const data = await res.json();
+        showToast(res.ok ? (data.message || 'Added!') : (data.error || 'Failed'));
+    } catch(err) { console.error(err); showToast('Error adding song.'); }
+};
+
+window.toggleLikeSong = async function(btn, trackData) {
+    try {
+        const res = await fetch('/playlists/like-song', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(trackData)
+        });
+        const data = await res.json();
+        if (res.ok) {
+            const goldHeart = `<svg viewBox="0 0 24 24" width="20" height="20" fill="var(--gold-primary)"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+            const emptyHeart = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+            btn.innerHTML = data.liked ? goldHeart : emptyHeart;
+            // Update inline like count if present
+            const countEl = btn.closest('tr') ? btn.closest('tr').querySelector('.like-count-badge') : null;
+            if (countEl && data.likeCount !== undefined) countEl.textContent = data.likeCount;
+            showToast(data.liked ? '❤️ Liked!' : 'Removed from liked');
+        }
+    } catch(err) { console.error(err); }
+};
+
+// ─── Toast Notifications ──────────────────────────────────────────────────
+function showToast(msg, type = 'success') {
+    const existing = document.querySelector('.mh-toast');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.className = `mh-toast mh-toast-${type}`;
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('mh-toast-show'));
+    setTimeout(() => {
+        toast.classList.remove('mh-toast-show');
+        setTimeout(() => toast.remove(), 400);
+    }, 2800);
+}
+window.showToast = showToast;
+
+// ─── Global Add to Playlist Modal Logic ───
+window.userPlaylistsData = <%- JSON.stringify((userPlaylists || []).filter(p => p.name !== 'Liked Songs').map(p => ({ id: p._id, name: p.name }))) %>;
+window.isUserRole = <%= account.role === 'user' ? 'true' : 'false' %>;
+
+let atpCurrentTrackData = null;
+
+window.openAddToPlaylistModal = function(trackData) {
+    if (!window.isUserRole) {
+        showToast('❌ Only users can add songs to playlists.', 'error');
+        return;
+    }
+    atpCurrentTrackData = trackData;
+
+    // Set track name in subtitle
+    document.getElementById('atp-track-name').textContent = '"' + (trackData.title || trackData.name || 'Unknown Track') + '"';
+
+    // Render playlist list
+    const listEl = document.getElementById('atp-playlists-list');
+    if (listEl) {
+        listEl.innerHTML = '';
+        const playlists = window.userPlaylistsData || [];
+        if (playlists.length === 0) {
+            listEl.innerHTML = '<p class="atp-no-playlists">You have no playlists yet. Create one below!</p>';
+        } else {
+            playlists.forEach(pl => {
+                const btn = document.createElement('button');
+                btn.className = 'atp-playlist-item';
+                btn.innerHTML = `
+                    <div class="atp-playlist-icon">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    </div>
+                    <span>${pl.name}</span>
+                    <svg class="atp-add-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+                btn.onclick = () => doAddToPlaylist(pl.id, trackData, btn);
+                listEl.appendChild(btn);
+            });
+        }
+    }
+
+    // Reset create form
+    const form = document.getElementById('atp-create-form');
+    const toggle = document.getElementById('atp-create-toggle');
+    const nameInput = document.getElementById('atp-new-playlist-name');
+    const descInput = document.getElementById('atp-new-playlist-desc');
+
+    if (form) form.classList.add('hidden');
+    if (toggle) toggle.classList.remove('active');
+    if (nameInput) nameInput.value = '';
+    if (descInput) descInput.value = '';
+
+    // Show modal
+    const modal = document.getElementById('atp-modal-overlay');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+};
+
+window.closeAddToPlaylistModal = function(e) {
+    if (e && e.target !== document.getElementById('atp-modal-overlay')) return;
+    const modal = document.getElementById('atp-modal-overlay');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+};
+
+window.toggleCreateForm = function() {
+    const form = document.getElementById('atp-create-form');
+    const toggle = document.getElementById('atp-create-toggle');
+    if (form && toggle) {
+        form.classList.toggle('hidden');
+        toggle.classList.toggle('active');
+        if (!form.classList.contains('hidden')) {
+            const nameInput = document.getElementById('atp-new-playlist-name');
+            if (nameInput) nameInput.focus();
+        }
+    }
+};
+
+async function doAddToPlaylist(playlistId, trackData, btn) {
+    if (btn) {
+        btn.disabled = true;
+        const spanEl = btn.querySelector('span');
+        if (spanEl) spanEl.textContent = 'Adding…';
+    }
+    try {
+        const payload = {
+            songId: trackData.isLocal === 'true' || trackData.isLocal === true ? (trackData.songId || trackData.id) : '',
+            spotifyId: trackData.isLocal === 'true' || trackData.isLocal === true ? '' : (trackData.spotifyId || trackData.id),
+            title: trackData.title || trackData.name,
+            artist: trackData.artist || (trackData.artists ? trackData.artists.map(a => a.name).join(', ') : ''),
+            album: trackData.album || '',
+            coverUrl: trackData.coverUrl || '',
+            isLocal: trackData.isLocal || false
+        };
+
+        const res = await fetch(`/playlists/${playlistId}/add-song`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+            showToast('✅ ' + (data.message || 'Added to playlist!'));
+            const modal = document.getElementById('atp-modal-overlay');
+            if (modal) modal.classList.remove('active');
+            document.body.style.overflow = '';
+        } else {
+            showToast('❌ ' + (data.error || 'Failed to add'), 'error');
+            if (btn) {
+                btn.disabled = false;
+                const spanEl = btn.querySelector('span');
+                if (spanEl) spanEl.textContent = btn.getAttribute('data-name') || 'Add';
+            }
+        }
+    } catch(err) {
+        console.error(err);
+        showToast('❌ Error adding song.', 'error');
+        if (btn) { btn.disabled = false; }
+    }
+}
+
+window.createAndAddToPlaylist = async function() {
+    const nameInput = document.getElementById('atp-new-playlist-name');
+    const descInput = document.getElementById('atp-new-playlist-desc');
+    if (!nameInput) return;
+    const name = nameInput.value.trim();
+    if (!name) {
+        nameInput.focus();
+        nameInput.style.borderColor = '#ff3b30';
+        setTimeout(() => nameInput.style.borderColor = '', 1500);
+        return;
+    }
+    const confirmBtn = document.querySelector('.atp-confirm-create-btn');
+    if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Creating…';
+    }
+
+    try {
+        // 1. Create playlist
+        const createRes = await fetch('/playlist/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, description: descInput ? descInput.value.trim() : '' })
+        });
+        const createData = await createRes.json();
+        if (!createRes.ok) {
+            showToast('❌ ' + (createData.error || 'Failed to create playlist'), 'error');
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Create & Add Song';
+            }
+            return;
+        }
+        const newPlaylistId = createData.playlist?._id || createData._id;
+        
+        // Add to local list and DOM sidebar if sidebar exists
+        window.userPlaylistsData = window.userPlaylistsData || [];
+        window.userPlaylistsData.push({ id: newPlaylistId, name });
+
+        // Update sidebar links dynamically if sidebar-playlist-list exists
+        const sidebarList = document.querySelector('.sidebar-playlist-list');
+        if (sidebarList) {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <a href="/playlist/${newPlaylistId}" class="sidebar-playlist-item">
+                    <div class="sidebar-playlist-dot"></div>
+                    <span class="sidebar-playlist-name">${name}</span>
+                </a>`;
+            sidebarList.appendChild(li);
+        }
+
+        // 2. Add song to new playlist
+        await doAddToPlaylist(newPlaylistId, atpCurrentTrackData, null);
+    } catch(err) {
+        console.error(err);
+        showToast('❌ Error creating playlist.', 'error');
+        if (confirmBtn) {
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'Create & Add Song';
+        }
+    }
+};
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('atp-modal-overlay');
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+});
+</script>
+
+<!-- ══════════════════════════════════════════════════════
+     GLOBAL ADD TO PLAYLIST MODAL HTML
+     ══════════════════════════════════════════════════════ -->
+<div id="atp-modal-overlay" class="atp-overlay" onclick="closeAddToPlaylistModal(event)">
+    <div class="atp-modal" onclick="event.stopPropagation()">
+        <div class="atp-modal-header">
+            <div>
+                <h2 class="atp-modal-title">Add to Playlist</h2>
+                <p class="atp-modal-subtitle" id="atp-track-name">Select a playlist</p>
+            </div>
+            <button class="atp-close-btn" onclick="closeAddToPlaylistModal()">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+
+        <!-- Existing Playlists -->
+        <div id="atp-playlists-list" class="atp-playlists-list"></div>
+
+        <!-- Create New Playlist -->
+        <div class="atp-create-section">
+            <button class="atp-create-toggle-btn" id="atp-create-toggle" onclick="toggleCreateForm()">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                Create New Playlist
+            </button>
+            <div id="atp-create-form" class="atp-create-form hidden">
+                <input type="text" id="atp-new-playlist-name" placeholder="Playlist name..." class="atp-input" maxlength="60">
+                <input type="text" id="atp-new-playlist-desc" placeholder="Description (optional)" class="atp-input">
+                <button class="atp-confirm-create-btn" onclick="createAndAddToPlaylist()">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Create & Add Song
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

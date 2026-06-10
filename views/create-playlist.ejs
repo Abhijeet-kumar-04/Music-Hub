@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Playlist | Music App</title>
+    <link rel="stylesheet" href="/css/style_dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <%- include('partials/sidebar') %>
+        <main class="main-content">
+            <%- include('partials/header') %>
+            
+            <section class="content-area">
+                <div class="premium-form-container">
+                    <h2 style="font-size: 1.8rem; margin-top: 0; margin-bottom: 25px; color: var(--gold-primary); border-bottom: 1px solid var(--border-gold); padding-bottom: 10px;">Create New Playlist</h2>
+                    <form action="/playlists" method="POST">
+                        <div class="form-group">
+                            <label for="name">Playlist Name *</label>
+                            <input type="text" id="name" name="name" placeholder="E.g., Chill Vibes, Workout Mix" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description (Optional)</label>
+                            <textarea id="description" name="description" rows="4" placeholder="Enter playlist description..."></textarea>
+                        </div>
+                        <button type="submit" class="premium-btn" style="margin-top: 10px;">Create Playlist</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

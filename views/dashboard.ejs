@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | MusicHub</title>
+    <meta name="description" content="Your personal music dashboard — latest hits, personalized picks, and top artists.">
+    <link rel="stylesheet" href="/css/style_dashboard.css">
+</head>
+<body>
+<div class="dashboard-container">
+    <%- include('partials/sidebar') %>
+
+    <main class="main-content">
+        <%- include('partials/header') %>
+
+        <!-- ── Category Pills ─────────────────────────────────────────── -->
+        <div class="category-pills-bar">
+            <div class="category-pills-track">
+                <button class="pill active" data-category="all" onclick="setActivePill(this, 'all')">All</button>
+                <button class="pill" data-category="Songs" onclick="setActivePill(this, 'Songs')">🎵 Songs</button>
+                <button class="pill" data-category="Rap" onclick="setActivePill(this, 'Rap')">🎤 Rap</button>
+                <button class="pill" data-category="Pop Music" onclick="setActivePill(this, 'Pop Music')">⭐ Pop</button>
+                <button class="pill" data-category="Bollywood" onclick="setActivePill(this, 'Bollywood')">🎬 Bollywood</button>
+                <button class="pill" data-category="Instrumental" onclick="setActivePill(this, 'Instrumental')">🎸 Instrumental</button>
+                <button class="pill" data-category="Lo-Fi" onclick="setActivePill(this, 'Lo-Fi')">☕ Lo-Fi</button>
+                <button class="pill" data-category="Hip Hop" onclick="setActivePill(this, 'Hip Hop')">🔥 Hip-Hop</button>
+                <button class="pill" data-category="Devotional" onclick="setActivePill(this, 'Devotional')">🙏 Devotional</button>
+                <button class="pill" data-category="Podcast" onclick="setActivePill(this, 'Podcast')">🎙️ Podcasts</button>
+            </div>
+        </div>
+
+        <!-- ── Category Results Container ────────────────────────────── -->
+        <div id="category-results-container" class="hidden content-area" style="padding-top: 0;">
+            <div id="category-results-title" style="font-size:1.4rem;font-weight:800;margin-bottom:18px;color:var(--text-white);"></div>
+            <!-- Skeleton Loader -->
+            <div id="category-skeleton" class="category-skeleton-grid">
+                <% for(let i=0;i<6;i++) { %>
+                <div class="skeleton-card">
+                    <div class="skeleton skeleton-img"></div>
+                    <div class="skeleton skeleton-text"></div>
+                    <div class="skeleton skeleton-text-sm"></div>
+                </div>
+                <% } %>
+            </div>
+            <div id="category-tracks-list"></div>
+        </div>
+
+        <!-- ── Main Feed ───────────────────────────────────────────────── -->
+        <section class="content-area dashboard-feed" id="main-feed">
+
+            <!-- Greeting -->
+            <div class="greeting-block">
+                <h1 class="greeting-title">Good <%= new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening' %>, <span style="color:var(--gold-primary);"><%= account.name.split(' ')[0] %></span> 👋</h1>
+                <p class="greeting-subtitle">Here's what's hot right now</p>
+            </div>
+
+            <!-- Quick Access Shortcuts -->
+            <div class="quick-access-grid">
+                <a href="/search?q=trending" class="quick-access-card">
+                    <div class="quick-card-icon" style="background:linear-gradient(135deg,#7F00FF,#E100FF);">🔥</div>
+                    <span>Trending</span>
+                </a>
+                <a href="/library/playlists" class="quick-access-card">
+                    <div class="quick-card-icon" style="background:linear-gradient(135deg,#d4af37,#aa8513);">💛</div>
+                    <span>Liked Songs</span>
+                </a>
+                <a href="/browse/new-releases" class="quick-access-card">
+                    <div class="quick-card-icon" style="background:linear-gradient(135deg,#1ED760,#157a3c);">🆕</div>
+                    <span>New Releases</span>
+                </a>
+                <a href="/browse/artists" class="quick-access-card">
+                    <div class="quick-card-icon" style="background:linear-gradient(135deg,#E13300,#ff6b35);">⭐</div>
+                    <span>Top Artists</span>
+                </a>
+            </div>
+
+            <!-- ── Trending Hits ───────────────────────────────────────── -->
+            <% if (typeof trendingHits !== 'undefined' && trendingHits && trendingHits.length > 0) { %>
+            <div class="feed-section">
+                <div class="section-header">
+                    <h2 class="section-title">🔥 Latest Hit Songs</h2>
+                    <a href="/search?q=trending hindi" class="section-see-all">See all →</a>
+                </div>
+                <div class="feed-tracks-grid">
+                    <% trendingHits.forEach((track, i) => { %>
+                    <% if (track) { %>
+                    <a href="/track/<%= track.id %>" class="feed-track-card-link" style="text-decoration:none;color:inherit;display:block;">
+                        <div class="feed-track-card">
+                            <div class="feed-track-cover">
+                                <img src="<%= track.album && track.album.images ? track.album.images[0].url : 'https://placehold.co/200x200/0f2038/ffd700?text=♪' %>" alt="<%= track.name %>" loading="lazy">
+                                <div class="feed-track-play-overlay" onclick="event.preventDefault(); event.stopPropagation(); playFeedTrack(<%= JSON.stringify({
+                                    id: track.id,
+                                    name: track.name,
+                                    artist: track.artists ? track.artists.map(a => a.name).join(', ') : 'Unknown',
+                                    coverUrl: track.album && track.album.images ? track.album.images[0].url : '',
+                                    audioUrl: track.audioUrl || '',
+                                    isLocal: false
+                                }).replace(/</g, '\\u003c').replace(/"/g, '&quot;') %>)">
+                                    <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>
+                            <div class="feed-track-info">
+                                <div class="feed-track-name"><%= track.name %></div>
+                                <div class="feed-track-artist"><%= track.artists ? track.artists.map(a => a.name).join(', ') : 'Unknown' %></div>
+                            </div>
+                        </div>
+                    </a>
+                    <% } %>
+                    <% }); %>
+                </div>
+            </div>
+            <% } %>
+
+            <!-- ── For You ─────────────────────────────────────────────── -->
+            <% if (typeof recommendedSongs !== 'undefined' && recommendedSongs && recommendedSongs.length > 0) { %>
+            <div class="feed-section">
+                <div class="section-header">
+                    <h2 class="section-title">✨ For You</h2>
+                    <a href="/search?q=english hits" class="section-see-all">Discover more →</a>
+                </div>
+                <div class="feed-tracks-grid">
+                    <% recommendedSongs.forEach((track, i) => { %>
+                    <% if (track) { %>
+                    <a href="/track/<%= track.id %>" class="feed-track-card-link" style="text-decoration:none;color:inherit;display:block;">
+                        <div class="feed-track-card">
+                            <div class="feed-track-cover">
+                                <img src="<%= track.album && track.album.images ? track.album.images[0].url : 'https://placehold.co/200x200/0f2038/ffd700?text=♪' %>" alt="<%= track.name %>" loading="lazy">
+                                <div class="feed-track-play-overlay" onclick="event.preventDefault(); event.stopPropagation(); playFeedTrack(<%= JSON.stringify({
+                                    id: track.id,
+                                    name: track.name,
+                                    artist: track.artists ? track.artists.map(a => a.name).join(', ') : 'Unknown',
+                                    coverUrl: track.album && track.album.images ? track.album.images[0].url : '',
+                                    audioUrl: track.audioUrl || '',
+                                    isLocal: false
+                                }).replace(/</g, '\\u003c').replace(/"/g, '&quot;') %>)">
+                                    <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>
+                            <div class="feed-track-info">
+                                <div class="feed-track-name"><%= track.name %></div>
+                                <div class="feed-track-artist"><%= track.artists ? track.artists.map(a => a.name).join(', ') : 'Unknown' %></div>
+                            </div>
+                        </div>
+                    </a>
+                    <% } %>
+                    <% }); %>
+                </div>
+            </div>
+            <% } %>
+
+            <!-- ── Browse Categories Carousel ─────────────────────────── -->
+            <div class="feed-section">
+                <div class="section-header">
+                    <h2 class="section-title">🎵 Browse All</h2>
+                </div>
+                <div class="carousel-wrapper">
+                    <div class="items-carousel" id="browse-carousel">
+                        <% if (typeof items !== 'undefined' && items) { %>
+                        <% items.forEach(category => { %>
+                            <a href="/category/<%= category.id %>" class="item-card-link">
+                                <div class="item-card">
+                                    <% if (category.icons && category.icons.length > 0) { %>
+                                        <img src="<%= category.icons[0].url %>" alt="<%= category.name %>" loading="lazy">
+                                    <% } else { %>
+                                        <div style="width:100%;aspect-ratio:1;background:var(--bg-surface);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:2rem;">🎵</div>
+                                    <% } %>
+                                    <h4><%= category.name %></h4>
+                                </div>
+                            </a>
+                        <% }); %>
+                        <% } %>
+                    </div>
+                    <button class="scroll-arrow prev" onclick="scrollCarousel('browse-carousel', -1)">
+                        <svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3" d="M15 18l-6-6 6-6"/></svg>
+                    </button>
+                    <button class="scroll-arrow next" onclick="scrollCarousel('browse-carousel', 1)">
+                        <svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3" d="M9 18l6-6-6-6"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ── Top Artists Leaderboard ─────────────────────────────── -->
+            <% if (typeof topArtists !== 'undefined' && topArtists && topArtists.length > 0) { %>
+            <div class="feed-section">
+                <div class="section-header">
+                    <h2 class="section-title">🏆 Top Artists Leaderboard</h2>
+                    <a href="/browse/artists" class="section-see-all">See all artists →</a>
+                </div>
+                <div class="leaderboard-list">
+                    <% topArtists.forEach((artist, i) => { %>
+                    <a href="/artist/<%= artist._id %>" class="leaderboard-row">
+                        <div class="leaderboard-rank <%= i === 0 ? 'rank-gold' : i === 1 ? 'rank-silver' : i === 2 ? 'rank-bronze' : '' %>">
+                            <%= i + 1 %>
+                        </div>
+                        <div class="leaderboard-avatar">
+                            <%= artist.name.charAt(0).toUpperCase() %>
+                        </div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name"><%= artist.name %></div>
+                            <div class="leaderboard-meta">
+                                <%= artist.songCount %> song<%= artist.songCount !== 1 ? 's' : '' %> &bull;
+                                <%= artist.followersCount.toLocaleString() %> followers
+                            </div>
+                        </div>
+                        <div class="leaderboard-listeners">
+                            <span class="listeners-count"><%= artist.monthlyListeners.toLocaleString() %></span>
+                            <span class="listeners-label">monthly listeners</span>
+                        </div>
+                        <div class="leaderboard-bar-wrap">
+                            <div class="leaderboard-bar" style="width:<%= Math.min(100, (artist.monthlyListeners / (topArtists[0].monthlyListeners || 1)) * 100).toFixed(0) %>%;"></div>
+                        </div>
+                    </a>
+                    <% }); %>
+                </div>
+            </div>
+            <% } else { %>
+            <!-- Empty leaderboard placeholder -->
+            <div class="feed-section">
+                <div class="section-header"><h2 class="section-title">🏆 Top Artists Leaderboard</h2></div>
+                <div class="empty-state-card">
+                    <div class="empty-state-icon">🎤</div>
+                    <h3>No artists yet</h3>
+                    <p>Artists who upload songs will appear here ranked by popularity.</p>
+                    <% if (account.role === 'artist') { %>
+                        <a href="/songs/upload" class="btn-create">Upload Your First Song</a>
+                    <% } %>
+                </div>
+            </div>
+            <% } %>
+
+        </section>
+    </main>
+</div>
+
+<script>
+// ─── Category Pills ──────────────────────────────────────────────────────
+function setActivePill(btn, category) {
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+
+    const resultsContainer = document.getElementById('category-results-container');
+    const mainFeed = document.getElementById('main-feed');
+    const titleEl = document.getElementById('category-results-title');
+    const skeleton = document.getElementById('category-skeleton');
+    const tracksList = document.getElementById('category-tracks-list');
+
+    if (category === 'all') {
+        resultsContainer.classList.add('hidden');
+        mainFeed.style.display = '';
+        return;
+    }
+
+    mainFeed.style.display = 'none';
+    resultsContainer.classList.remove('hidden');
+    titleEl.textContent = `${btn.textContent.trim()} Tracks`;
+    skeleton.style.display = 'grid';
+    tracksList.innerHTML = '';
+
+    fetch(`/api/songs/category?category=${encodeURIComponent(category)}`)
+        .then(r => r.json())
+        .then(tracks => {
+            skeleton.style.display = 'none';
+            if (!tracks || tracks.length === 0) {
+                tracksList.innerHTML = '<p style="color:var(--text-muted);padding:20px 0;">No tracks found for this category.</p>';
+                return;
+            }
+            // Register in global queue
+            window.trackQueue = tracks;
+            window.trackQueueIndex = -1;
+
+            const grid = document.createElement('div');
+            grid.className = 'feed-tracks-grid';
+            tracks.forEach((track, i) => {
+                if (!track) return;
+                const card = document.createElement('div');
+                card.className = 'feed-track-card';
+                const coverUrl = (track.album && track.album.images && track.album.images[0]) ? track.album.images[0].url : 'https://placehold.co/200x200/0f2038/ffd700?text=♪';
+                const artistName = track.artists ? track.artists.map(a => a.name).join(', ') : 'Unknown';
+                card.innerHTML = `
+                    <div class="feed-track-cover">
+                        <img src="${coverUrl}" alt="${track.name}" loading="lazy" onerror="this.src='https://placehold.co/200x200/0f2038/ffd700?text=♪'">
+                        <div class="feed-track-play-overlay">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                    <div class="feed-track-info">
+                        <div class="feed-track-name">${track.name}</div>
+                        <div class="feed-track-artist">${artistName}</div>
+                    </div>`;
+                card.onclick = () => {
+                    window.trackQueueIndex = i;
+                    window.playTrack({ id: track.id, name: track.name, artist: artistName, coverUrl, audioUrl: track.audioUrl || '', isLocal: false });
+                };
+                grid.appendChild(card);
+            });
+            tracksList.appendChild(grid);
+        })
+        .catch(err => {
+            skeleton.style.display = 'none';
+            tracksList.innerHTML = '<p style="color:var(--text-muted);">Failed to load tracks.</p>';
+            console.error(err);
+        });
+}
+
+// ─── Feed Track Play ─────────────────────────────────────────────────────
+function playFeedTrack(trackData) {
+    window.playTrack(trackData);
+}
+
+// ─── Carousel Arrows ─────────────────────────────────────────────────────
+function scrollCarousel(id, dir) {
+    const el = document.getElementById(id);
+    if (el) el.scrollBy({ left: dir * el.clientWidth * 0.7, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

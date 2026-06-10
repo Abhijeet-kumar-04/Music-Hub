@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Center | MusicHub</title>
+    <link rel="stylesheet" href="/css/style_dashboard.css">
+    <style>
+        .support-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .support-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .support-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-white);
+            margin-bottom: 10px;
+        }
+        .support-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+        .support-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        @media(max-width: 768px) {
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .support-card {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .support-card h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--text-white);
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 10px;
+        }
+        /* FAQ Accordion Details */
+        .faq-item {
+            margin-bottom: 12px;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.01);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        .faq-item[open] {
+            border-color: var(--border-gold);
+            background: rgba(212, 175, 55, 0.03);
+        }
+        .faq-item summary {
+            padding: 15px;
+            font-weight: 600;
+            color: var(--text-white);
+            cursor: pointer;
+            outline: none;
+            user-select: none;
+        }
+        .faq-item summary:hover {
+            color: var(--gold-primary);
+        }
+        .faq-content {
+            padding: 15px;
+            border-top: 1px solid var(--border-light);
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        /* Support Form Inputs */
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            color: var(--text-white);
+            font-size: 0.95rem;
+            transition: all 0.25s ease;
+            outline: none;
+        }
+        .form-control:focus {
+            border-color: var(--border-gold);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);
+        }
+        .btn-submit {
+            background: var(--gold-primary);
+            color: #000;
+            font-weight: 700;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+        .btn-submit:hover {
+            background: #ffe34d;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <%- include('partials/sidebar') %>
+        <main class="main-content">
+            <%- include('partials/header') %>
+            
+            <section class="content-area">
+                <div class="support-container">
+                    <div class="support-header">
+                        <h1>How can we help you today?</h1>
+                        <p>Search FAQs or submit a ticket to our friendly operations team</p>
+                    </div>
+
+                    <div class="support-grid">
+                        <!-- FAQs Column -->
+                        <div class="support-card">
+                            <h2>Frequently Asked Questions</h2>
+                            
+                            <details class="faq-item">
+                                <summary>How do I upload local songs?</summary>
+                                <div class="faq-content">
+                                    Only users registered as "Artist" role can upload songs. Log into an Artist account, go to "Upload Song" in the sidebar, fill in song metadata, select an MP3 file, and submit.
+                                </div>
+                            </details>
+
+                            <details class="faq-item">
+                                <summary>How do I add a song to my playlist?</summary>
+                                <div class="faq-content">
+                                    Browse songs using search. Click the "+ Add" button on any track row, choose one of your existing playlists, or type a name to create a new playlist and add the song in one click.
+                                </div>
+                            </details>
+
+                            <details class="faq-item">
+                                <summary>Can I merge two playlists together?</summary>
+                                <div class="faq-content">
+                                    Yes! Go to "My Library" playlists in the sidebar. Scroll to the "Merge Playlists" section at the bottom, select a source playlist, a target playlist, and click "Merge Tracks".
+                                </div>
+                            </details>
+
+                            <details class="faq-item">
+                                <summary>Why isn't the audio playing?</summary>
+                                <div class="faq-content">
+                                    Check if the track has a valid streaming link. Local uploaded songs will play direct MP3s, while external tracks fall back to high-quality audio previews. Ensure your browser volume is turned up!
+                                </div>
+                            </details>
+                        </div>
+
+                        <!-- Ticket Submission Form -->
+                        <div class="support-card">
+                            <h2>Submit a Support Ticket</h2>
+                            <form id="supportTicketForm" onsubmit="submitTicket(event)">
+                                <div class="form-group">
+                                    <label for="ticketName">Full Name</label>
+                                    <input type="text" id="ticketName" class="form-control" value="<%= account.name %>" readonly required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ticketEmail">Email Address</label>
+                                    <input type="email" id="ticketEmail" class="form-control" value="<%= account.email %>" readonly required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ticketSubject">Subject</label>
+                                    <input type="text" id="ticketSubject" class="form-control" placeholder="What is the issue about?" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ticketMessage">Detailed Message</label>
+                                    <textarea id="ticketMessage" rows="5" class="form-control" placeholder="Describe your issue or feedback in detail..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn-submit">Submit Support Ticket</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function submitTicket(e) {
+            e.preventDefault();
+            const subject = document.getElementById('ticketSubject').value.trim();
+            const message = document.getElementById('ticketMessage').value.trim();
+            if(!subject || !message) return;
+
+            showToast('📩 Ticket submitted successfully! We will email you shortly.');
+            document.getElementById('ticketSubject').value = '';
+            document.getElementById('ticketMessage').value = '';
+        }
+    </script>
+</body>
+</html>

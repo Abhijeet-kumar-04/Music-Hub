@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= track.name %> | Music App</title>
+    <link rel="stylesheet" href="/css/style_dashboard.css">
+    <style>
+        .track-detail-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .track-showcase {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(15, 23, 42, 0.4) 100%);
+            border: 1px solid var(--border-gold);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            backdrop-filter: var(--glass-blur);
+            margin-bottom: 40px;
+        }
+        .track-showcase img {
+            width: 300px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            border: 1.5px solid var(--border-gold);
+            transition: transform 0.3s ease;
+        }
+        .track-showcase img:hover {
+            transform: scale(1.03);
+        }
+        .track-showcase-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .track-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--gold-primary);
+            background: rgba(212, 175, 55, 0.15);
+            padding: 4px 10px;
+            border-radius: 20px;
+            width: fit-content;
+            margin-bottom: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        .track-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 0 0 10px 0;
+            color: var(--text-white);
+            line-height: 1.2;
+        }
+        .track-meta {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            margin: 0 0 30px 0;
+        }
+        .track-meta a {
+            color: var(--gold-primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .track-meta a:hover {
+            text-decoration: underline;
+        }
+        .track-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .btn-track-play {
+            background: var(--gold-primary);
+            color: #000;
+            font-weight: 700;
+            padding: 14px 32px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+        .btn-track-play:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+            background: #ffe34d;
+        }
+        .btn-track-icon {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-light);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-white);
+            transition: all 0.25s ease;
+        }
+        .btn-track-icon:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--border-gold);
+            transform: scale(1.08);
+        }
+        .track-about {
+            background: rgba(15, 23, 42, 0.3);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 30px;
+        }
+        .track-about h3 {
+            margin-top: 0;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            color: var(--text-white);
+        }
+        .track-about p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+        @media(max-width: 768px) {
+            .track-showcase {
+                flex-direction: column;
+                padding: 24px;
+                text-align: center;
+            }
+            .track-badge {
+                margin: 0 auto 15px;
+            }
+            .track-title {
+                font-size: 2.2rem;
+            }
+            .track-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <%- include('partials/sidebar') %>
+        <main class="main-content">
+            <%- include('partials/header') %>
+            
+            <section class="content-area">
+                <div class="track-detail-container">
+                    <div class="track-showcase">
+                        <img src="<%= track.coverUrl || '/images/default-cover.png' %>" alt="<%= track.name %> Artwork" onerror="this.src='/images/default-cover.png'">
+                        <div class="track-showcase-info">
+                            <span class="track-badge">Song Detail</span>
+                            <h1 class="track-title"><%= track.name %></h1>
+                            <p class="track-meta">
+                                By <span style="color:var(--text-white); font-weight:600;"><%= track.artist %></span> &bull; 
+                                Album: <span style="color:var(--text-white); font-weight:600;"><%= track.album %></span>
+                            </p>
+                            
+                            <div class="track-actions">
+                                <button class="btn-track-play" onclick="playTrack({
+                                    id: '<%= track.id %>',
+                                    name: '<%= track.name.replace(/'/g, "\\'") %>',
+                                    artist: '<%= track.artist.replace(/'/g, "\\'") %>',
+                                    coverUrl: '<%= track.coverUrl %>',
+                                    audioUrl: '<%= track.audioUrl %>',
+                                    spotifyId: '<%= track.spotifyId %>',
+                                    isLocal: <%= track.isLocal ? 'true' : 'false' %>
+                                })">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                                    Play Song
+                                </button>
+                                
+                                <% if (account.role === 'user') { %>
+                                    <!-- Like Button -->
+                                    <button class="btn-track-icon" onclick="toggleLikeSong(this, {
+                                        songId: '<%= track.isLocal ? track.id : "" %>',
+                                        spotifyId: '<%= !track.isLocal ? track.spotifyId : "" %>',
+                                        title: '<%= track.name.replace(/'/g, "\\'") %>',
+                                        artist: '<%= track.artist.replace(/'/g, "\\'") %>',
+                                        album: '<%= track.album.replace(/'/g, "\\'") %>',
+                                        coverUrl: '<%= track.coverUrl %>',
+                                        isLocal: <%= track.isLocal ? 'true' : 'false' %>
+                                    })" title="Like Song">
+                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                    </button>
+                                    
+                                    <!-- Add to Playlist Button -->
+                                    <button class="btn-track-icon" onclick="openAddToPlaylistModal({
+                                        songId: '<%= track.isLocal ? track.id : "" %>',
+                                        spotifyId: '<%= !track.isLocal ? track.spotifyId : "" %>',
+                                        title: '<%= track.name.replace(/'/g, "\\'") %>',
+                                        artist: '<%= track.artist.replace(/'/g, "\\'") %>',
+                                        album: '<%= track.album.replace(/'/g, "\\'") %>',
+                                        coverUrl: '<%= track.coverUrl %>',
+                                        isLocal: <%= track.isLocal ? 'true' : 'false' %>
+                                    })" title="Add to Playlist">
+                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    </button>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="track-about">
+                        <h3>About this song</h3>
+                        <p>
+                            This is a featured high-definition track titled "<strong><%= track.name %></strong>" by <strong><%= track.artist %></strong>, from the release <strong><%= track.album %></strong>. 
+                            It is currently streaming on MusicHub at high quality. Use the action panel above to instantly add it to your customized libraries or play it in our persistent media player.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

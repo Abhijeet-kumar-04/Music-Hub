@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Playlists | Music App</title>
+    <link rel="stylesheet" href="/css/style_dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <%- include('partials/sidebar') %>
+        <main class="main-content">
+            <%- include('partials/header') %>
+            
+            <section class="content-area">
+                <div class="page-header">
+                    <h2>My Library Playlists</h2>
+                    <% if (account.role === 'user') { %>
+                        <a href="/playlist/create" class="btn-create">Create Playlist</a>
+                    <% } %>
+                </div>
+
+                <div class="playlist-grid">
+                    <% if (playlists && playlists.length > 0) { %>
+                        <% playlists.forEach(playlist => { %>
+                            <div class="playlist-card">
+                                <a href="/playlist/<%= playlist._id %>" style="text-decoration: none; color: inherit; display: block; flex-grow: 1;">
+                                    <img src="https://placehold.co/300x300/3A6073/FFFFFF?text=<%= encodeURIComponent(playlist.name) %>" alt="<%= playlist.name %> Cover">
+                                    <h4><%= playlist.name %></h4>
+                                    <p><%= playlist.description || 'No description' %></p>
+                                </a>
+                                <% if (playlist.name !== 'Liked Songs') { %>
+                                    <form action="/playlists/<%= playlist._id %>/delete" method="POST" style="margin-top: 10px;" onsubmit="return confirm('Are you sure you want to delete this playlist?')">
+                                        <button type="submit" class="btn-delete" style="width: 100%;">Delete Playlist</button>
+                                    </form>
+                                <% } %>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="no-playlists">
+                            <h3 style="margin-top: 0;">No Playlists Found</h3>
+                            <p style="color: #b3b3b3;">Create a playlist to start organizing your favorite songs.</p>
+                            <a href="/playlist/create" class="btn-create" style="margin-top: 10px;">Create Playlist</a>
+                        </div>
+                    <% } %>
+                </div>
+
+                <% if (account.role === 'user' && playlists && playlists.length > 1) { %>
+                    <div class="merge-section">
+                        <h3>Merge Playlists</h3>
+                        <p>Combine all tracks from one playlist into another playlist seamlessly.</p>
+                        <div id="mergeErrorMessage" class="merge-error-message"></div>
+                        <form action="/playlists/merge" method="POST" class="merge-form" onsubmit="return validateMergeForm(event)">
+                            <div class="merge-group">
+                                <label>Source Playlist (Copy from)</label>
+                                <div class="custom-select-container" id="sourcePlaylistSelectContainer">
+                                    <div class="custom-select-trigger" onclick="toggleDropdown('sourceDropdown', event)">
+                                        <span id="sourceSelectedText" class="placeholder">Select Source</span>
+                                        <svg class="chevron-icon" viewBox="0 0 24 24" width="16" height="16">
+                                            <path d="M7 10l5 5 5-5z" fill="currentColor"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="custom-options-container" id="sourceDropdown">
+                                        <div class="custom-option placeholder selected" data-value="" data-name="Select Source" onclick="handleOptionClick(this, 'source', event)">Select Source</div>
+                                        <% playlists.forEach(playlist => { %>
+                                            <div class="custom-option" data-value="<%= playlist._id %>" data-name="<%= playlist.name %>" onclick="handleOptionClick(this, 'source', event)"><%= playlist.name %></div>
+                                        <% }); %>
+                                    </div>
+                                    <input type="hidden" id="sourcePlaylistId" name="sourcePlaylistId">
+                                </div>
+                            </div>
+                            <div class="merge-group">
+                                <label>Target Playlist (Paste to)</label>
+                                <div class="custom-select-container" id="targetPlaylistSelectContainer">
+                                    <div class="custom-select-trigger" onclick="toggleDropdown('targetDropdown', event)">
+                                        <span id="targetSelectedText" class="placeholder">Select Target</span>
+                                        <svg class="chevron-icon" viewBox="0 0 24 24" width="16" height="16">
+                                            <path d="M7 10l5 5 5-5z" fill="currentColor"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="custom-options-container" id="targetDropdown">
+                                        <div class="custom-option placeholder selected" data-value="" data-name="Select Target" onclick="handleOptionClick(this, 'target', event)">Select Target</div>
+                                        <% playlists.forEach(playlist => { %>
+                                            <div class="custom-option" data-value="<%= playlist._id %>" data-name="<%= playlist.name %>" onclick="handleOptionClick(this, 'target', event)"><%= playlist.name %></div>
+                                        <% }); %>
+                                    </div>
+                                    <input type="hidden" id="targetPlaylistId" name="targetPlaylistId">
+                                </div>
+                            </div>
+                            <button type="submit" class="merge-submit-btn">Merge Tracks</button>
+                        </form>
+                    </div>
+                <% } %>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function toggleDropdown(dropdownId, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            const dropdown = document.getElementById(dropdownId);
+            const container = dropdown.parentElement;
+            
+            // Close other dropdowns
+            document.querySelectorAll('.custom-select-container').forEach(c => {
+                if (c !== container) {
+                    c.classList.remove('open');
+                }
+            });
+            
+            container.classList.toggle('open');
+        }
+
+        function handleOptionClick(element, type, event) {
+            const value = element.getAttribute('data-value');
+            const name = element.getAttribute('data-name');
+            selectOption(type, value, name, event);
+        }
+
+        function selectOption(type, value, text, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            const container = document.getElementById(type + 'PlaylistSelectContainer');
+            const hiddenInput = document.getElementById(type + 'PlaylistId');
+            const selectedTextSpan = document.getElementById(type + 'SelectedText');
+            const dropdown = document.getElementById(type + 'Dropdown');
+            
+            // Update input and label
+            hiddenInput.value = value;
+            selectedTextSpan.textContent = text;
+            
+            if (value === '') {
+                selectedTextSpan.classList.add('placeholder');
+            } else {
+                selectedTextSpan.classList.remove('placeholder');
+            }
+            
+            // Update selected class
+            dropdown.querySelectorAll('.custom-option').forEach(option => {
+                if (option.getAttribute('data-value') === value) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+            
+            // Close dropdown
+            container.classList.remove('open');
+            
+            // Clear error message if validation is now clean
+            const errorMessage = document.getElementById('mergeErrorMessage');
+            if (errorMessage) {
+                errorMessage.style.display = 'none';
+            }
+        }
+
+        function validateMergeForm(event) {
+            const sourceVal = document.getElementById('sourcePlaylistId').value;
+            const targetVal = document.getElementById('targetPlaylistId').value;
+            
+            if (!sourceVal) {
+                showMergeError('Please select a Source Playlist.');
+                event.preventDefault();
+                return false;
+            }
+            if (!targetVal) {
+                showMergeError('Please select a Target Playlist.');
+                event.preventDefault();
+                return false;
+            }
+            if (sourceVal === targetVal) {
+                showMergeError('Source and Target playlists must be different.');
+                event.preventDefault();
+                return false;
+            }
+            return true;
+        }
+
+        function showMergeError(message) {
+            const errorMessage = document.getElementById('mergeErrorMessage');
+            if (errorMessage) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+                errorMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        // Close dropdowns on click outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.custom-select-container')) {
+                document.querySelectorAll('.custom-select-container').forEach(c => {
+                    c.classList.remove('open');
+                });
+            }
+        });
+
+        // Close dropdowns on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                document.querySelectorAll('.custom-select-container').forEach(c => {
+                    c.classList.remove('open');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

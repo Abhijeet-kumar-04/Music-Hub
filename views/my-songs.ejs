@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage My Songs | MusicHub</title>
+    <link rel="stylesheet" href="/css/style_dashboard.css">
+    <style>
+        .btn-upload-nav {
+            background: linear-gradient(135deg, #d4af37 0%, #aa8513 100%);
+            color: #08101F;
+            text-decoration: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: bold;
+            display: inline-block;
+            transition: all 0.3s;
+            border: none;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+        }
+        .btn-upload-nav:hover {
+            background: linear-gradient(135deg, #ffd700 0%, #c49a1b 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+        }
+        .no-songs-container {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 16px;
+            border: 1px dashed var(--border-gold);
+        }
+        .no-songs-container h3 {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+        .no-songs-container p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <%- include('partials/sidebar') %>
+        <main class="main-content">
+            <%- include('partials/header') %>
+            
+            <section class="content-area">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <h2 style="font-size: 2rem; font-weight: 700; margin: 0;">My Uploaded Songs</h2>
+                    <a href="/songs/upload" class="btn-upload-nav">Upload New Song</a>
+                </div>
+ 
+                <% if (songs && songs.length > 0) { %>
+                    <table class="song-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Track</th>
+                                <th>Album</th>
+                                <th style="text-align:center;width:80px;">❤️ Likes</th>
+                                <th>Date Added</th>
+                                <th style="text-align: right; width: 250px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% songs.forEach((song, index) => { %>
+                                <% const trackId = song._id.toString(); %>
+                                <tr data-track-id="<%= trackId %>">
+                                    <td style="width: 50px;">
+                                        <span class="song-index-num"><%= index + 1 %></span>
+                                        <div class="song-play-wave playing-wave-container">
+                                            <div class="playing-wave-bar"></div>
+                                            <div class="playing-wave-bar"></div>
+                                            <div class="playing-wave-bar"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="song-title-cell">
+                                            <img src="<%= song.coverUrl || '/images/default-cover.png' %>" alt="Cover">
+                                            <div>
+                                                <div class="song-title"><%= song.title %></div>
+                                                <div class="song-artist"><%= song.artist %></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><%= song.album || 'Single' %></td>
+                                    <td style="text-align:center;"><span class="like-count-badge"><%= song.likes ? song.likes.length : 0 %></span></td>
+                                    <td><%= song.createdAt.toLocaleDateString() %></td>
+                                    <td class="actions-cell">
+                                        <!-- Play button triggers global player -->
+                                        <button class="play-row-btn" onclick="playTrack({
+                                            id: '<%= trackId %>',
+                                            name: '<%= song.title.replace(/'/g, "\\'") %>',
+                                            artist: '<%= song.artist.replace(/'/g, "\\'") %>',
+                                            coverUrl: '<%= song.coverUrl %>',
+                                            audioUrl: '<%= song.audioUrl %>',
+                                            isLocal: true
+                                        })">Play</button>
+                                        
+                                        <!-- Delete form -->
+                                        <form action="/songs/delete/<%= song._id %>" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this song?')">
+                                            <button type="submit" class="delete-row-btn">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <div class="no-songs-container">
+                        <h3>No Songs Published Yet</h3>
+                        <p>Share your music with the world! Upload your first track today.</p>
+                        <a href="/songs/upload" class="btn-upload-nav">Publish a Track</a>
+                    </div>
+                <% } %>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
