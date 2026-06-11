@@ -171,33 +171,81 @@
             </div>
             <% } %>
 
-            <!-- ── Browse Categories Carousel ─────────────────────────── -->
+            <!-- ── Browse All Sections ─────────────────────────────── -->
             <div class="feed-section">
                 <div class="section-header">
                     <h2 class="section-title">🎵 Browse All</h2>
                 </div>
-                <div class="carousel-wrapper">
-                    <div class="items-carousel" id="browse-carousel">
-                        <% if (typeof items !== 'undefined' && items) { %>
-                        <% items.forEach(category => { %>
-                            <a href="/category/<%= category.id %>" class="item-card-link">
-                                <div class="item-card">
-                                    <% if (category.icons && category.icons.length > 0) { %>
-                                        <img src="<%= category.icons[0].url %>" alt="<%= category.name %>" loading="lazy">
-                                    <% } else { %>
-                                        <div style="width:100%;aspect-ratio:1;background:var(--bg-surface);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:2rem;">🎵</div>
-                                    <% } %>
-                                    <h4><%= category.name %></h4>
-                                </div>
-                            </a>
-                        <% }); %>
-                        <% } %>
-                    </div>
-                    <button class="scroll-arrow prev" onclick="scrollCarousel('browse-carousel', -1)">
-                        <svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3" d="M15 18l-6-6 6-6"/></svg>
+            </div>
+
+            <!-- Bollywood -->
+            <div class="feed-section" id="section-bollywood">
+                <h3 style="margin-bottom: 15px; padding-left: 20px; font-size: 1.4rem;">Bollywood</h3>
+                <div class="feed-tracks-grid" id="bollywood-grid"></div>
+                <div class="load-more-container" id="bollywood-load-more-wrap">
+                    <button id="bollywood-load-more-btn" class="load-more-btn" onclick="loadMoreSection('bollywood', 'bollywood hits')">
+                        <span class="lm-text">Load More</span>
+                        <span class="lm-spinner" style="display:none;"></span>
                     </button>
-                    <button class="scroll-arrow next" onclick="scrollCarousel('browse-carousel', 1)">
-                        <svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3" d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </div>
+
+            <!-- Punjabi -->
+            <div class="feed-section" id="section-punjabi">
+                <h3 style="margin-bottom: 15px; padding-left: 20px; font-size: 1.4rem;">Punjabi</h3>
+                <div class="feed-tracks-grid" id="punjabi-grid"></div>
+                <div class="load-more-container" id="punjabi-load-more-wrap">
+                    <button id="punjabi-load-more-btn" class="load-more-btn" onclick="loadMoreSection('punjabi', 'punjabi hits')">
+                        <span class="lm-text">Load More</span>
+                        <span class="lm-spinner" style="display:none;"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pop -->
+            <div class="feed-section" id="section-pop">
+                <h3 style="margin-bottom: 15px; padding-left: 20px; font-size: 1.4rem;">Pop</h3>
+                <div class="feed-tracks-grid" id="pop-grid"></div>
+                <div class="load-more-container" id="pop-load-more-wrap">
+                    <button id="pop-load-more-btn" class="load-more-btn" onclick="loadMoreSection('pop', 'pop hits')">
+                        <span class="lm-text">Load More</span>
+                        <span class="lm-spinner" style="display:none;"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lofi -->
+            <div class="feed-section" id="section-lofi">
+                <h3 style="margin-bottom: 15px; padding-left: 20px; font-size: 1.4rem;">Lofi</h3>
+                <div class="feed-tracks-grid" id="lofi-grid"></div>
+                <div class="load-more-container" id="lofi-load-more-wrap">
+                    <button id="lofi-load-more-btn" class="load-more-btn" onclick="loadMoreSection('lofi', 'lofi chill')">
+                        <span class="lm-text">Load More</span>
+                        <span class="lm-spinner" style="display:none;"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Indie -->
+            <div class="feed-section" id="section-indie">
+                <h3 style="margin-bottom: 15px; padding-left: 20px; font-size: 1.4rem;">Indie</h3>
+                <div class="feed-tracks-grid" id="indie-grid"></div>
+                <div class="load-more-container" id="indie-load-more-wrap">
+                    <button id="indie-load-more-btn" class="load-more-btn" onclick="loadMoreSection('indie', 'indie vibes')">
+                        <span class="lm-text">Load More</span>
+                        <span class="lm-spinner" style="display:none;"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Acoustic -->
+            <div class="feed-section" id="section-acoustic">
+                <h3 style="margin-bottom: 15px; padding-left: 20px; font-size: 1.4rem;">Acoustic</h3>
+                <div class="feed-tracks-grid" id="acoustic-grid"></div>
+                <div class="load-more-container" id="acoustic-load-more-wrap">
+                    <button id="acoustic-load-more-btn" class="load-more-btn" onclick="loadMoreSection('acoustic', 'acoustic hits')">
+                        <span class="lm-text">Load More</span>
+                        <span class="lm-spinner" style="display:none;"></span>
                     </button>
                 </div>
             </div>
@@ -265,12 +313,28 @@
 </div>
 
 <script>
-// ─── State: per-section page tracking ────────────────────────────────────
+// ─── Pagination State ────────────────────────────────────────────────────
 const sectionState = {
-    trending:  { page: 1, query: 'trending hindi',       loading: false, exhausted: false },
-    foryou:    { page: 1, query: 'latest english songs', loading: false, exhausted: false },
-    category:  { page: 1, query: '',                     loading: false, exhausted: false }
+    trending: { page: 1, loading: false, exhausted: false, query: 'trending hindi' },
+    foryou: { page: 1, loading: false, exhausted: false, query: 'latest english songs' },
+    leaderboard: { page: 1, loading: false, exhausted: false },
+    category: { page: 1, loading: false, exhausted: false, query: 'new releases' },
+    bollywood: { page: 0, loading: false, exhausted: false, query: 'bollywood hits' },
+    punjabi: { page: 0, loading: false, exhausted: false, query: 'punjabi hits' },
+    pop: { page: 0, loading: false, exhausted: false, query: 'pop hits' },
+    lofi: { page: 0, loading: false, exhausted: false, query: 'lofi chill' },
+    indie: { page: 0, loading: false, exhausted: false, query: 'indie vibes' },
+    acoustic: { page: 0, loading: false, exhausted: false, query: 'acoustic hits' }
 };
+
+// ─── Auto-fetch sections on load ─────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    Object.keys(sectionState).forEach(id => {
+        if (['bollywood', 'punjabi', 'pop', 'lofi', 'indie', 'acoustic'].includes(id)) {
+            loadMoreSection(id);
+        }
+    });
+});
 
 // ─── Leaderboard: server-rendered; load more from embedded data ───────────
 const ALL_ARTISTS = <%- JSON.stringify((typeof topArtists !== 'undefined' && topArtists ? topArtists : [])) %>;
