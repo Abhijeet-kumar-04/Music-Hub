@@ -89,9 +89,9 @@
                                             <!-- Play Button -->
                                             <button class="play-row-btn" onclick="playTrack({
                                                 id: '<%= trackId %>',
-                                                name: '<%= item.track.name.replace(/'/g, "\\'") %>',
-                                                artist: '<%= item.track.artists?.map(a => a.name).join(", ").replace(/'/g, "\\'") %>',
-                                                coverUrl: '<%= item.track.album?.images[0]?.url || "" %>',
+                                                name: '<%= item.track.name ? item.track.name.replace(/'/g, "\\'") : "" %>',
+                                                artist: '<%= item.track.artists ? item.track.artists.map(a => a.name).join(", ").replace(/'/g, "\\'") : "" %>',
+                                                coverUrl: '<%= item.track.album && item.track.album.images && item.track.album.images.length > 0 ? item.track.album.images[0].url : "" %>',
                                                 audioUrl: '<%= item.track.audioUrl || "" %>',
                                                 spotifyId: '<%= item.track.isLocal ? "" : item.track.id %>',
                                                 isLocal: '<%= item.track.isLocal %>'
@@ -102,10 +102,10 @@
                                                 <button class="like-row-btn" onclick="toggleLikeSong(this, {
                                                     songId: '<%= item.track.isLocal ? item.track.id : "" %>',
                                                     spotifyId: '<%= !item.track.isLocal ? item.track.id : "" %>',
-                                                    title: '<%= item.track.name.replace(/'/g, "\\'") %>',
-                                                    artist: '<%= item.track.artists?.map(a => a.name).join(", ").replace(/'/g, "\\'") %>',
-                                                    album: '<%= item.track.album?.name.replace(/'/g, "\\'") %>',
-                                                    coverUrl: '<%= item.track.album?.images[0]?.url || "" %>',
+                                                    title: '<%= item.track.name ? item.track.name.replace(/'/g, "\\'") : "" %>',
+                                                    artist: '<%= item.track.artists ? item.track.artists.map(a => a.name).join(", ").replace(/'/g, "\\'") : "" %>',
+                                                    album: '<%= item.track.album && item.track.album.name ? item.track.album.name.replace(/'/g, "\\'") : "" %>',
+                                                    coverUrl: '<%= item.track.album && item.track.album.images && item.track.album.images.length > 0 ? item.track.album.images[0].url : "" %>',
                                                     isLocal: <%= item.track.isLocal ? 'true' : 'false' %>
                                                 })">
                                                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
@@ -115,10 +115,10 @@
                                                 <button class="add-playlist-btn" onclick="openAddToPlaylistModal({
                                                     songId: '<%= item.track.isLocal ? item.track.id : "" %>',
                                                     spotifyId: '<%= !item.track.isLocal ? item.track.id : "" %>',
-                                                    title: '<%= item.track.name.replace(/'/g, "\\'") %>',
-                                                    artist: '<%= item.track.artists?.map(a => a.name).join(", ").replace(/'/g, "\\'") %>',
-                                                    album: '<%= item.track.album?.name.replace(/'/g, "\\'") %>',
-                                                    coverUrl: '<%= item.track.album?.images[0]?.url || "" %>',
+                                                    title: '<%= item.track.name ? item.track.name.replace(/'/g, "\\'") : "" %>',
+                                                    artist: '<%= item.track.artists ? item.track.artists.map(a => a.name).join(", ").replace(/'/g, "\\'") : "" %>',
+                                                    album: '<%= item.track.album && item.track.album.name ? item.track.album.name.replace(/'/g, "\\'") : "" %>',
+                                                    coverUrl: '<%= item.track.album && item.track.album.images && item.track.album.images.length > 0 ? item.track.album.images[0].url : "" %>',
                                                     isLocal: <%= item.track.isLocal ? 'true' : 'false' %>
                                                 })">+ Add</button>
  
