@@ -124,16 +124,21 @@ const apiSearch = async (req, res) => {
 };
 
 const apiGetCategorySongs = async (req, res) => {
-  const { category } = req.query;
-  if (!category) return res.json([]);
+  const { category, page = 1, limit = 12 } = req.query;
+  if (!category) return res.json({ tracks: [], hasMore: false });
   try {
-    const tracks = await saavnApi.searchSongs(category, 1, 12);
-    res.json(tracks);
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(30, Math.max(6, parseInt(limit) || 12));
+    const tracks = await saavnApi.searchSongs(category, pageNum, limitNum + 1); // fetch 1 extra to detect hasMore
+    const hasMore = tracks.length > limitNum;
+    const sliced = hasMore ? tracks.slice(0, limitNum) : tracks;
+    res.json({ tracks: sliced, hasMore });
   } catch (err) {
     console.error('Category songs API error:', err);
-    res.status(500).json({ error: 'Failed to load category' });
+    res.status(500).json({ error: 'Failed to load category', tracks: [], hasMore: false });
   }
 };
+
 
 const followArtist = async (req, res) => {
   try {
@@ -147,7 +152,7 @@ const followArtist = async (req, res) => {
 
 const getArtists = async (req, res) => {
   try {
-    const data = await musicService.getArtistsList(req.query.q, req.session.accountId, req.session.role);
+    const data = await musicService.getArtistsList(req.query.q, req.session.accountId, req.session.role, 0, 20);
     res.render('browse-artists', {
       account: data.loggedInUser,
       artists: data.artists,
@@ -158,6 +163,22 @@ const getArtists = async (req, res) => {
   } catch (error) {
     console.error('Artists Controller Error:', error);
     res.status(500).send('Could not load artists page.');
+  }
+};
+
+const apiGetArtists = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = parseInt(req.query.offset) || 0;
+    const data = await musicService.getArtistsList(req.query.q, req.session.accountId, req.session.role, offset, limit + 1);
+    
+    const hasMore = data.artists.length > limit;
+    const sliced = hasMore ? data.artists.slice(0, limit) : data.artists;
+    
+    res.json({ artists: sliced, hasMore });
+  } catch (error) {
+    console.error('API Artists Error:', error);
+    res.status(500).json({ error: 'Could not load artists', artists: [], hasMore: false });
   }
 };
 
@@ -445,6 +466,7 @@ module.exports = {
   apiGetCategorySongs,
   followArtist,
   getArtists,
+  apiGetArtists,
   getArtistDetail,
   apiGetArtistAlbums,
   getUploadPage,

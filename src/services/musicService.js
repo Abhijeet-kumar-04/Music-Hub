@@ -309,7 +309,7 @@ const toggleFollowArtist = async (artistId, userId, role) => {
   }
 };
 
-const getArtistsList = async (query, accountId, role) => {
+const getArtistsList = async (query, accountId, role, offset = 0, limit = 20) => {
   const loggedInUser = role === 'user'
     ? await User.findById(accountId).populate('playlists')
     : await Artist.findById(accountId);
@@ -320,9 +320,9 @@ const getArtistsList = async (query, accountId, role) => {
 
   let localArtists = [];
   if (query) {
-    localArtists = await Artist.find({ name: { $regex: query, $options: 'i' } });
+    localArtists = await Artist.find({ name: { $regex: query, $options: 'i' } }).skip(offset).limit(limit);
   } else {
-    localArtists = await Artist.find({}).limit(10);
+    localArtists = await Artist.find({}).skip(offset).limit(limit);
   }
 
   const formattedLocalArtists = localArtists.map(art => ({
@@ -334,10 +334,10 @@ const getArtistsList = async (query, accountId, role) => {
   let spotifyArtists = [];
   try {
     if (query) {
-      const searchData = await spotifyApi.searchArtists(query, { limit: 20, country: 'IN' });
+      const searchData = await spotifyApi.searchArtists(query, { limit: limit, offset: offset, country: 'IN' });
       spotifyArtists = searchData.body.artists.items;
     } else {
-      const searchData = await spotifyApi.searchArtists("Top Artists India", { limit: 20, country: 'IN' });
+      const searchData = await spotifyApi.searchArtists("Top Artists India", { limit: limit, offset: offset, country: 'IN' });
       spotifyArtists = searchData.body.artists.items;
     }
   } catch (err) {

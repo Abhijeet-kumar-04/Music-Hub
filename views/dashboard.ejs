@@ -32,10 +32,10 @@
 
         <!-- ── Category Results Container ────────────────────────────── -->
         <div id="category-results-container" class="hidden content-area" style="padding-top: 0;">
-            <div id="category-results-title" style="font-size:1.4rem;font-weight:800;margin-bottom:18px;color:var(--text-white);"></div>
+            <div id="category-results-title" class="category-results-heading"></div>
             <!-- Skeleton Loader -->
-            <div id="category-skeleton" class="category-skeleton-grid">
-                <% for(let i=0;i<6;i++) { %>
+            <div id="category-skeleton" class="category-skeleton-grid" style="display:none;">
+                <% for(let i=0;i<12;i++) { %>
                 <div class="skeleton-card">
                     <div class="skeleton skeleton-img"></div>
                     <div class="skeleton skeleton-text"></div>
@@ -43,7 +43,15 @@
                 </div>
                 <% } %>
             </div>
+            <!-- Track Grid for category results -->
             <div id="category-tracks-list"></div>
+            <!-- Load More for category -->
+            <div class="load-more-container" id="category-load-more-wrap" style="display:none;">
+                <button id="category-load-more-btn" class="load-more-btn" onclick="loadMoreCategory()">
+                    <span class="lm-text">Load More Tracks</span>
+                    <span class="lm-spinner" style="display:none;"></span>
+                </button>
+            </div>
         </div>
 
         <!-- ── Main Feed ───────────────────────────────────────────────── -->
@@ -77,18 +85,18 @@
 
             <!-- ── Trending Hits ───────────────────────────────────────── -->
             <% if (typeof trendingHits !== 'undefined' && trendingHits && trendingHits.length > 0) { %>
-            <div class="feed-section">
+            <div class="feed-section" id="section-trending">
                 <div class="section-header">
                     <h2 class="section-title">🔥 Latest Hit Songs</h2>
                     <a href="/search?q=trending hindi" class="section-see-all">See all →</a>
                 </div>
-                <div class="feed-tracks-grid">
+                <div class="feed-tracks-grid" id="trending-grid">
                     <% trendingHits.forEach((track, i) => { %>
                     <% if (track) { %>
                     <a href="/track/<%= track.id %>" class="feed-track-card-link" style="text-decoration:none;color:inherit;display:block;">
                         <div class="feed-track-card">
                             <div class="feed-track-cover">
-                                <img src="<%= track.album && track.album.images ? track.album.images[0].url : 'https://placehold.co/200x200/0f2038/ffd700?text=♪' %>" alt="<%= track.name %>" loading="lazy">
+                                <img src="<%= track.album && track.album.images ? track.album.images[0].url : 'https://placehold.co/200x200/0f2038/ffd700?text=♪' %>" alt="<%= track.name %>" loading="lazy" onerror="this.src='https://placehold.co/200x200/0f2038/ffd700?text=♪'">
                                 <div class="feed-track-play-overlay" onclick="event.preventDefault(); event.stopPropagation(); playFeedTrack(<%= JSON.stringify({
                                     id: track.id,
                                     name: track.name,
@@ -108,24 +116,31 @@
                     </a>
                     <% } %>
                     <% }); %>
+                </div>
+                <!-- Load More: Trending -->
+                <div class="load-more-container" id="trending-load-more-wrap">
+                    <button id="trending-load-more-btn" class="load-more-btn" onclick="loadMoreSection('trending', 'trending hindi')">
+                        <span class="lm-text">Load More</span>
+                        <span class="lm-spinner" style="display:none;"></span>
+                    </button>
                 </div>
             </div>
             <% } %>
 
             <!-- ── For You ─────────────────────────────────────────────── -->
             <% if (typeof recommendedSongs !== 'undefined' && recommendedSongs && recommendedSongs.length > 0) { %>
-            <div class="feed-section">
+            <div class="feed-section" id="section-foryou">
                 <div class="section-header">
                     <h2 class="section-title">✨ For You</h2>
                     <a href="/search?q=english hits" class="section-see-all">Discover more →</a>
                 </div>
-                <div class="feed-tracks-grid">
+                <div class="feed-tracks-grid" id="foryou-grid">
                     <% recommendedSongs.forEach((track, i) => { %>
                     <% if (track) { %>
                     <a href="/track/<%= track.id %>" class="feed-track-card-link" style="text-decoration:none;color:inherit;display:block;">
                         <div class="feed-track-card">
                             <div class="feed-track-cover">
-                                <img src="<%= track.album && track.album.images ? track.album.images[0].url : 'https://placehold.co/200x200/0f2038/ffd700?text=♪' %>" alt="<%= track.name %>" loading="lazy">
+                                <img src="<%= track.album && track.album.images ? track.album.images[0].url : 'https://placehold.co/200x200/0f2038/ffd700?text=♪' %>" alt="<%= track.name %>" loading="lazy" onerror="this.src='https://placehold.co/200x200/0f2038/ffd700?text=♪'">
                                 <div class="feed-track-play-overlay" onclick="event.preventDefault(); event.stopPropagation(); playFeedTrack(<%= JSON.stringify({
                                     id: track.id,
                                     name: track.name,
@@ -145,6 +160,13 @@
                     </a>
                     <% } %>
                     <% }); %>
+                </div>
+                <!-- Load More: For You -->
+                <div class="load-more-container" id="foryou-load-more-wrap">
+                    <button id="foryou-load-more-btn" class="load-more-btn" onclick="loadMoreSection('foryou', 'latest english songs')">
+                        <span class="lm-text">Load More</span>
+                        <span class="lm-spinner" style="display:none;"></span>
+                    </button>
                 </div>
             </div>
             <% } %>
@@ -187,8 +209,8 @@
                     <h2 class="section-title">🏆 Top Artists Leaderboard</h2>
                     <a href="/browse/artists" class="section-see-all">See all artists →</a>
                 </div>
-                <div class="leaderboard-list">
-                    <% topArtists.forEach((artist, i) => { %>
+                <div class="leaderboard-list" id="leaderboard-list">
+                    <% topArtists.slice(0, 5).forEach((artist, i) => { %>
                     <a href="/artist/<%= artist._id %>" class="leaderboard-row">
                         <div class="leaderboard-rank <%= i === 0 ? 'rank-gold' : i === 1 ? 'rank-silver' : i === 2 ? 'rank-bronze' : '' %>">
                             <%= i + 1 %>
@@ -213,6 +235,15 @@
                     </a>
                     <% }); %>
                 </div>
+                <% if (topArtists.length > 5) { %>
+                <!-- Load More: Leaderboard -->
+                <div class="load-more-container" id="leaderboard-load-more-wrap">
+                    <button id="leaderboard-load-more-btn" class="load-more-btn" onclick="loadMoreLeaderboard()">
+                        <span class="lm-text">Show More Artists</span>
+                        <span class="lm-spinner" style="display:none;"></span>
+                    </button>
+                </div>
+                <% } %>
             </div>
             <% } else { %>
             <!-- Empty leaderboard placeholder -->
@@ -234,8 +265,201 @@
 </div>
 
 <script>
-// ─── Category Pills ──────────────────────────────────────────────────────
-function setActivePill(btn, category) {
+// ─── State: per-section page tracking ────────────────────────────────────
+const sectionState = {
+    trending:  { page: 1, query: 'trending hindi',       loading: false, exhausted: false },
+    foryou:    { page: 1, query: 'latest english songs', loading: false, exhausted: false },
+    category:  { page: 1, query: '',                     loading: false, exhausted: false }
+};
+
+// ─── Leaderboard: server-rendered; load more from embedded data ───────────
+const ALL_ARTISTS = <%- JSON.stringify((typeof topArtists !== 'undefined' && topArtists ? topArtists : [])) %>;
+let leaderboardShown = Math.min(5, ALL_ARTISTS.length);
+
+function loadMoreLeaderboard() {
+    const btn = document.getElementById('leaderboard-load-more-btn');
+    const list = document.getElementById('leaderboard-list');
+    const wrap = document.getElementById('leaderboard-load-more-wrap');
+    const BATCH = 5;
+    const next = ALL_ARTISTS.slice(leaderboardShown, leaderboardShown + BATCH);
+
+    if (!next.length) {
+        wrap.style.display = 'none';
+        return;
+    }
+
+    next.forEach((artist, i) => {
+        const rank = leaderboardShown + i + 1;
+        const row = document.createElement('a');
+        row.href = `/artist/${artist._id}`;
+        row.className = 'leaderboard-row';
+        row.innerHTML = `
+            <div class="leaderboard-rank">${rank}</div>
+            <div class="leaderboard-avatar">${artist.name.charAt(0).toUpperCase()}</div>
+            <div class="leaderboard-info">
+                <div class="leaderboard-name">${artist.name}</div>
+                <div class="leaderboard-meta">${artist.songCount} song${artist.songCount !== 1 ? 's' : ''} &bull; ${artist.followersCount.toLocaleString()} followers</div>
+            </div>
+            <div class="leaderboard-listeners">
+                <span class="listeners-count">${artist.monthlyListeners.toLocaleString()}</span>
+                <span class="listeners-label">monthly listeners</span>
+            </div>
+            <div class="leaderboard-bar-wrap">
+                <div class="leaderboard-bar" style="width:${Math.min(100, (artist.monthlyListeners / (ALL_ARTISTS[0].monthlyListeners || 1)) * 100).toFixed(0)}%;"></div>
+            </div>`;
+        list.appendChild(row);
+    });
+
+    leaderboardShown += next.length;
+    if (leaderboardShown >= ALL_ARTISTS.length) {
+        setBtnState(btn, 'done', 'All Artists Shown');
+        setTimeout(() => { wrap.style.display = 'none'; }, 1000);
+    }
+}
+
+// ─── Helper: set load-more button state ─────────────────────────────────
+function setBtnState(btn, state, label) {
+    if (!btn) return;
+    const textEl = btn.querySelector('.lm-text');
+    const spinEl = btn.querySelector('.lm-spinner');
+    if (state === 'loading') {
+        btn.disabled = true;
+        btn.classList.add('loading');
+        if (textEl) textEl.textContent = 'Loading…';
+        if (spinEl) spinEl.style.display = 'inline-block';
+    } else if (state === 'done') {
+        btn.disabled = true;
+        btn.classList.remove('loading');
+        btn.classList.add('exhausted');
+        if (textEl) textEl.textContent = label || 'No more tracks';
+        if (spinEl) spinEl.style.display = 'none';
+    } else { // 'ready'
+        btn.disabled = false;
+        btn.classList.remove('loading', 'exhausted');
+        if (textEl) textEl.textContent = label || 'Load More';
+        if (spinEl) spinEl.style.display = 'none';
+    }
+}
+
+// ─── Build a track card element ──────────────────────────────────────────
+function buildTrackCard(track, sectionId, queueIdx) {
+    const coverUrl = (track.album && track.album.images && track.album.images[0]) 
+        ? track.album.images[0].url 
+        : 'https://placehold.co/200x200/0f2038/ffd700?text=♪';
+    const artistName = track.artists ? track.artists.map(a => a.name).join(', ') : 'Unknown';
+    
+    const card = document.createElement('div');
+    card.className = 'feed-track-card';
+    card.innerHTML = `
+        <div class="feed-track-cover">
+            <img src="${coverUrl}" alt="${track.name}" loading="lazy" onerror="this.src='https://placehold.co/200x200/0f2038/ffd700?text=♪'">
+            <div class="feed-track-play-overlay">
+                <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+        </div>
+        <div class="feed-track-info">
+            <div class="feed-track-name">${track.name}</div>
+            <div class="feed-track-artist">${artistName}</div>
+        </div>`;
+    card.addEventListener('click', () => {
+        window.playTrack && window.playTrack({ id: track.id, name: track.name, artist: artistName, coverUrl, audioUrl: track.audioUrl || '', isLocal: false });
+    });
+    return card;
+}
+
+// ─── Load More for Trending / For You sections ───────────────────────────
+async function loadMoreSection(sectionId, defaultQuery) {
+    const state = sectionState[sectionId];
+    if (!state || state.loading || state.exhausted) return;
+
+    const btn = document.getElementById(`${sectionId}-load-more-btn`);
+    const wrap = document.getElementById(`${sectionId}-load-more-wrap`);
+    const grid = document.getElementById(`${sectionId}-grid`);
+    if (!grid) return;
+
+    state.loading = true;
+    setBtnState(btn, 'loading');
+
+    try {
+        const query = state.query || defaultQuery;
+        state.page++;
+        const res = await fetch(`/api/songs/category?category=${encodeURIComponent(query)}&page=${state.page}&limit=12`);
+        const data = await res.json();
+        const tracks = data.tracks || [];
+        const hasMore = data.hasMore !== false;
+
+        tracks.forEach((track, i) => {
+            if (!track) return;
+            const queueIdx = (state.page - 1) * 12 + i;
+            grid.appendChild(buildTrackCard(track, sectionId, queueIdx));
+        });
+
+        if (!hasMore || tracks.length === 0) {
+            state.exhausted = true;
+            setBtnState(btn, 'done', tracks.length === 0 ? 'No more tracks' : 'All caught up!');
+            setTimeout(() => { if (wrap) wrap.style.display = 'none'; }, 2000);
+        } else {
+            setBtnState(btn, 'ready', 'Load More');
+        }
+    } catch (err) {
+        console.error('Load more failed:', err);
+        state.page--; // revert page on error
+        setBtnState(btn, 'ready', 'Retry');
+    } finally {
+        state.loading = false;
+    }
+}
+
+// ─── Load More for Category pill results ─────────────────────────────────
+async function loadMoreCategory() {
+    const state = sectionState.category;
+    if (!state || state.loading || state.exhausted) return;
+
+    const btn = document.getElementById('category-load-more-btn');
+    const wrap = document.getElementById('category-load-more-wrap');
+    const list = document.getElementById('category-tracks-list');
+    const grid = list.querySelector('.feed-tracks-grid');
+    if (!grid) return;
+
+    state.loading = true;
+    setBtnState(btn, 'loading');
+
+    try {
+        state.page++;
+        const res = await fetch(`/api/songs/category?category=${encodeURIComponent(state.query)}&page=${state.page}&limit=12`);
+        const data = await res.json();
+        const tracks = data.tracks || [];
+        const hasMore = data.hasMore !== false;
+
+        // Update global queue
+        if (window.trackQueue && Array.isArray(window.trackQueue)) {
+            window.trackQueue = window.trackQueue.concat(tracks);
+        }
+
+        tracks.forEach((track, i) => {
+            if (!track) return;
+            const queueIdx = (state.page - 1) * 12 + i;
+            grid.appendChild(buildTrackCard(track, 'category', queueIdx));
+        });
+
+        if (!hasMore || tracks.length === 0) {
+            state.exhausted = true;
+            setBtnState(btn, 'done', tracks.length === 0 ? 'No more tracks' : 'All tracks loaded!');
+            setTimeout(() => { if (wrap) wrap.style.display = 'none'; }, 2000);
+        } else {
+            setBtnState(btn, 'ready', 'Load More Tracks');
+        }
+    } catch (err) {
+        console.error('Load more category failed:', err);
+        state.page--;
+        setBtnState(btn, 'ready', 'Retry');
+    } finally {
+        state.loading = false;
+    }
+}
+
+// ─── Category Pills ───────────────────────────────────────────────────────
+async function setActivePill(btn, category) {
     document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
 
@@ -244,6 +468,8 @@ function setActivePill(btn, category) {
     const titleEl = document.getElementById('category-results-title');
     const skeleton = document.getElementById('category-skeleton');
     const tracksList = document.getElementById('category-tracks-list');
+    const loadMoreWrap = document.getElementById('category-load-more-wrap');
+    const loadMoreBtn = document.getElementById('category-load-more-btn');
 
     if (category === 'all') {
         resultsContainer.classList.add('hidden');
@@ -251,61 +477,68 @@ function setActivePill(btn, category) {
         return;
     }
 
+    // Reset category state for fresh load
+    sectionState.category = { page: 1, query: category, loading: true, exhausted: false };
+
     mainFeed.style.display = 'none';
     resultsContainer.classList.remove('hidden');
     titleEl.textContent = `${btn.textContent.trim()} Tracks`;
     skeleton.style.display = 'grid';
     tracksList.innerHTML = '';
+    loadMoreWrap.style.display = 'none';
+    setBtnState(loadMoreBtn, 'ready', 'Load More Tracks');
 
-    fetch(`/api/songs/category?category=${encodeURIComponent(category)}`)
-        .then(r => r.json())
-        .then(tracks => {
-            skeleton.style.display = 'none';
-            if (!tracks || tracks.length === 0) {
-                tracksList.innerHTML = '<p style="color:var(--text-muted);padding:20px 0;">No tracks found for this category.</p>';
-                return;
-            }
-            // Register in global queue
-            window.trackQueue = tracks;
-            window.trackQueueIndex = -1;
+    try {
+        const res = await fetch(`/api/songs/category?category=${encodeURIComponent(category)}&page=1&limit=12`);
+        const data = await res.json();
+        const tracks = data.tracks || [];
+        const hasMore = data.hasMore !== false;
 
-            const grid = document.createElement('div');
-            grid.className = 'feed-tracks-grid';
-            tracks.forEach((track, i) => {
-                if (!track) return;
-                const card = document.createElement('div');
-                card.className = 'feed-track-card';
-                const coverUrl = (track.album && track.album.images && track.album.images[0]) ? track.album.images[0].url : 'https://placehold.co/200x200/0f2038/ffd700?text=♪';
-                const artistName = track.artists ? track.artists.map(a => a.name).join(', ') : 'Unknown';
-                card.innerHTML = `
-                    <div class="feed-track-cover">
-                        <img src="${coverUrl}" alt="${track.name}" loading="lazy" onerror="this.src='https://placehold.co/200x200/0f2038/ffd700?text=♪'">
-                        <div class="feed-track-play-overlay">
-                            <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    </div>
-                    <div class="feed-track-info">
-                        <div class="feed-track-name">${track.name}</div>
-                        <div class="feed-track-artist">${artistName}</div>
-                    </div>`;
-                card.onclick = () => {
-                    window.trackQueueIndex = i;
-                    window.playTrack({ id: track.id, name: track.name, artist: artistName, coverUrl, audioUrl: track.audioUrl || '', isLocal: false });
-                };
-                grid.appendChild(card);
-            });
-            tracksList.appendChild(grid);
-        })
-        .catch(err => {
-            skeleton.style.display = 'none';
-            tracksList.innerHTML = '<p style="color:var(--text-muted);">Failed to load tracks.</p>';
-            console.error(err);
+        skeleton.style.display = 'none';
+
+        if (!tracks || tracks.length === 0) {
+            tracksList.innerHTML = `
+                <div class="empty-state-card" style="margin-top:20px;">
+                    <div class="empty-state-icon">🔍</div>
+                    <h3>No tracks found</h3>
+                    <p>Try a different category or search for something specific.</p>
+                </div>`;
+            loadMoreWrap.style.display = 'none';
+            sectionState.category.loading = false;
+            return;
+        }
+
+        // Register in global queue
+        window.trackQueue = tracks;
+        window.trackQueueIndex = -1;
+
+        const grid = document.createElement('div');
+        grid.className = 'feed-tracks-grid';
+        tracks.forEach((track, i) => {
+            if (!track) return;
+            grid.appendChild(buildTrackCard(track, 'category', i));
         });
+        tracksList.appendChild(grid);
+
+        // Show/hide Load More
+        if (hasMore) {
+            loadMoreWrap.style.display = 'flex';
+            setBtnState(loadMoreBtn, 'ready', 'Load More Tracks');
+        } else {
+            loadMoreWrap.style.display = 'none';
+        }
+    } catch (err) {
+        skeleton.style.display = 'none';
+        tracksList.innerHTML = `<p style="color:var(--text-muted);padding:20px 0;">Failed to load tracks. Please try again.</p>`;
+        console.error(err);
+    } finally {
+        sectionState.category.loading = false;
+    }
 }
 
 // ─── Feed Track Play ─────────────────────────────────────────────────────
 function playFeedTrack(trackData) {
-    window.playTrack(trackData);
+    window.playTrack && window.playTrack(trackData);
 }
 
 // ─── Carousel Arrows ─────────────────────────────────────────────────────
@@ -313,6 +546,10 @@ function scrollCarousel(id, dir) {
     const el = document.getElementById(id);
     if (el) el.scrollBy({ left: dir * el.clientWidth * 0.7, behavior: 'smooth' });
 }
+
+// ─── Init: set sectionState queries from server data ─────────────────────
+sectionState.trending.query = 'trending hindi';
+sectionState.foryou.query = 'latest english songs';
 </script>
 </body>
 </html>
