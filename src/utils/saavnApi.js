@@ -35,14 +35,27 @@ async function searchSongs(query, page = 1, limit = 20) {
   if (!query) return [];
   try {
     const url = `https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&cc=in&p=${page}&n=${limit}&q=${encodeURIComponent(query)}`;
-    const res = await axios.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/json, text/plain, */*',
+    
+    let res;
+    let retries = 2;
+    while (retries >= 0) {
+      try {
+        res = await axios.get(url, {
+          timeout: 8000,
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/json, text/plain, */*',
+          }
+        });
+        break; // Success, exit retry loop
+      } catch (e) {
+        if (retries === 0) throw e;
+        retries--;
+        await new Promise(r => setTimeout(r, 1000)); // wait 1s before retry
       }
-    });
+    }
 
-    if (!res.data || !res.data.results) {
+    if (!res || !res.data || !res.data.results) {
       return [];
     }
 
