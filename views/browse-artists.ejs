@@ -52,6 +52,14 @@
                     <% } %>
                 <% }); %>
             </div>
+            <% if (artists.length >= 20) { %>
+            <div class="load-more-container" id="artists-load-more-wrap" style="display:flex;">
+                <button id="artists-load-more-btn" class="load-more-btn" onclick="loadMoreArtists()">
+                    <span class="lm-text">Load More Artists</span>
+                    <span class="lm-spinner" style="display:none;"></span>
+                </button>
+            </div>
+            <% } %>
             <% } else { %>
             <div class="empty-state-card" style="margin-top:40px;">
                 <div class="empty-state-icon">🎤</div>
@@ -63,5 +71,89 @@
         </section>
     </main>
 </div>
+
+<script>
+let currentPage = 1;
+const queryParams = new URLSearchParams(window.location.search);
+const query = queryParams.get('q') || '';
+let isLoading = false;
+let exhausted = false;
+
+async function loadMoreArtists() {
+    if (isLoading || exhausted) return;
+    
+    const btn = document.getElementById('artists-load-more-btn');
+    const wrap = document.getElementById('artists-load-more-wrap');
+    const grid = document.querySelector('.feed-tracks-grid');
+    
+    isLoading = true;
+    
+    // Set loading state
+    btn.disabled = true;
+    btn.classList.add('loading');
+    btn.querySelector('.lm-text').textContent = 'Loading...';
+    btn.querySelector('.lm-spinner').style.display = 'inline-block';
+    
+    try {
+        const offset = currentPage * 20;
+        const res = await fetch(`/api/artists?q=${encodeURIComponent(query)}&offset=${offset}&limit=20`);
+        const data = await res.json();
+        
+        if (data.artists && data.artists.length > 0) {
+            data.artists.forEach(artist => {
+                if (!artist) return;
+                const id = artist.id || artist._id;
+                const imageUrl = (artist.images && artist.images.length > 0) ? artist.images[0].url : '';
+                const imageHtml = imageUrl 
+                    ? `<img src="${imageUrl}" alt="${artist.name}" loading="lazy" onerror="this.src='https://placehold.co/200x200/0f2038/ffd700?text=🎤'" style="border-radius:50%;">`
+                    : `<div style="width:100%;aspect-ratio:1;background:linear-gradient(135deg,var(--gold-glow),var(--bg-surface));display:flex;align-items:center;justify-content:center;font-size:3rem;border-radius:50%;">🎤</div>`;
+                
+                const card = document.createElement('a');
+                card.href = `/artist/${id}`;
+                card.style.cssText = "text-decoration:none;color:inherit;display:block;";
+                card.innerHTML = `
+                    <div class="feed-track-card" style="text-align:center;">
+                        <div class="feed-track-cover" style="border-radius:50%;overflow:hidden;">
+                            ${imageHtml}
+                            <div class="feed-track-play-overlay" style="border-radius:50%;">
+                                <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
+                        </div>
+                        <div class="feed-track-info">
+                            <div class="feed-track-name">${artist.name}</div>
+                            <div class="feed-track-artist">Artist</div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            currentPage++;
+        }
+        
+        if (!data.hasMore || !data.artists || data.artists.length === 0) {
+            exhausted = true;
+            btn.classList.remove('loading');
+            btn.classList.add('exhausted');
+            btn.querySelector('.lm-text').textContent = 'No more artists';
+            btn.querySelector('.lm-spinner').style.display = 'none';
+            setTimeout(() => { wrap.style.display = 'none'; }, 2000);
+        } else {
+            // Restore ready state
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            btn.querySelector('.lm-text').textContent = 'Load More Artists';
+            btn.querySelector('.lm-spinner').style.display = 'none';
+        }
+    } catch (err) {
+        console.error('Load more artists failed:', err);
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        btn.querySelector('.lm-text').textContent = 'Retry';
+        btn.querySelector('.lm-spinner').style.display = 'none';
+    } finally {
+        isLoading = false;
+    }
+}
+</script>
 </body>
 </html>

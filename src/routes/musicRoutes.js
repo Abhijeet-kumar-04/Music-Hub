@@ -36,6 +36,7 @@ router.get('/api/search', isAuthenticated, musicController.apiSearch);
 router.get('/api/songs/category', isAuthenticated, musicController.apiGetCategorySongs);
 router.post('/artist/:id/follow', isAuthenticated, musicController.followArtist);
 router.get('/api/artist/:id/albums', isAuthenticated, musicController.apiGetArtistAlbums);
+router.get('/api/artists', isAuthenticated, musicController.apiGetArtists);
 router.post('/playlist/create', isAuthenticated, musicController.apiCreatePlaylist);
 router.post('/playlists/:id/add-song', isAuthenticated, musicController.apiAddSongToPlaylist);
 router.post('/playlists/like-song', isAuthenticated, musicController.apiLikeSong);
