@@ -1,74 +1,149 @@
 # 🎵 Music Hub
 
-Welcome to **Music Hub**, a premium, full-stack web application designed to provide an unparalleled, ad-free music streaming experience.
+![NodeJS](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge)
+![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
+![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg?style=for-the-badge)
 
-Music Hub combines the world-class metadata and categorization of the Spotify API with the robust audio-delivery network of JioSaavn, delivering a seamless, high-quality music experience that feels premium but operates completely free of charge.
+## 📖 Description
+
+**What it does:** Music Hub is a full-stack, premium web application designed to provide a completely free, ad-free music streaming experience. It uses a unique hybrid-engine approach, leveraging Spotify's API for beautiful metadata (categories, artist images, global charts) and the JioSaavn API for the actual secure audio delivery. 
+
+**Why it was built:** Mainstream music platforms lock essential features (like ad-free listening, specific track selection, and high-quality audio) behind premium paywalls. Furthermore, independent artists struggle to upload their music without paying third-party distributors. Music Hub was built to solve both problems: giving listeners a premium, unrestricted streaming experience for free, and providing indie artists a direct portal to upload and share their music.
+
+**Who it is for:** Music Hub is for avid music listeners who want an uninterrupted, ad-free streaming experience, and for independent artists looking for a platform to upload and share their custom tracks alongside mainstream hits.
+
+---
+
+## 📑 Table of Contents
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Prerequisites](#-prerequisites)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Roadmap / Future Plans](#-roadmap--future-plans)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Acknowledgments](#-acknowledgments)
+- [Contact Information](#-contact-information)
+
+---
 
 ## ✨ Features
 
-- **Ad-Free Music Streaming**: Listen to any song without interruptions.
-- **Hybrid API Engine**: Uses Spotify for rich metadata, categories, and artist information, and JioSaavn for secure, encrypted audio streaming.
-- **Beautiful UI/UX**: Features a highly responsive, modern dark-mode interface with glassmorphism effects, dynamic carousels, and premium micro-animations.
-- **Artist & User Roles**: Users can listen to music and create custom playlists. Users who register as **Artists** can upload their own local tracks directly to the platform!
-- **Global Leaderboards & Trends**: Real-time trending hits, "For You" recommendations, and top artist leaderboards.
-- **Robust Security**: Built with production-ready security including Helmet, Rate Limiting, and MongoDB Session Stores.
+- **Ad-Free Streaming:** Listen to any song, anytime, with zero audio or visual interruptions.
+- **Hybrid API Engine:** Spotify handles the rich metadata and UI organization, while JioSaavn handles the backend audio streaming.
+- **Artist Upload Portal:** Users can register as Artists and upload their own local `.mp3` tracks directly to the platform.
+- **Custom Playlists:** Create, edit, and manage your own personal playlists.
+- **Dynamic Dashboard:** Real-time trending hits, "For You" recommendations, top artist leaderboards, and categorized genres with robust "Load More" pagination.
+- **Premium UI/UX:** Responsive dark-mode interface with glassmorphism, dynamic carousels, and modern typography.
 
 ---
 
-## 🤔 How is Music Hub Different from Spotify? (The Significance)
+## 🛠️ Tech Stack
 
-If someone asks you, *"Why use Music Hub instead of Spotify?"*, here is your answer:
-
-1. **The Ultimate Hybrid Experience (Free & Ad-Free):** 
-   Spotify requires a paid Premium subscription to select specific songs without ads or shuffle-lock on mobile. Music Hub leverages a brilliant technical workaround: it uses Spotify's API for its beautiful data and categories, but dynamically fetches the actual audio files via JioSaavn. This gives users a **Spotify Premium-tier experience for absolutely zero cost**.
-
-2. **A Haven for Independent Creators:**
-   Unlike Spotify, which requires artists to go through complex third-party distributors (like DistroKid or TuneCore) to upload music, Music Hub features a built-in **Artist Portal**. Independent creators can register an Artist account and upload their local `.mp3` files directly to the platform, instantly sharing their music alongside mainstream hits.
-
-3. **Lightweight & Privacy-Focused:**
-   Music Hub doesn't track your every move with heavy algorithmic profiling or third-party ad trackers. It is a lightweight, open-source alternative that focuses purely on the joy of listening to music.
+- **Frontend:** HTML5, Vanilla CSS3, EJS (Embedded JavaScript templates)
+- **Backend:** Node.js, Express.js
+- **Database:** MongoDB (Mongoose, connect-mongo)
+- **APIs:** Spotify Web API, JioSaavn Unofficial API
+- **Security:** Helmet, Express Rate Limit, bcryptjs, JWT
+- **Media Handling:** Multer (for local audio uploads)
 
 ---
 
-## 🚀 Deployment Guide (Render)
+## ⚙️ Prerequisites
 
-This application is fully optimized to be deployed on **[Render](https://render.com/)**. Follow these steps to go live:
-
-### 1. Database Setup (MongoDB Atlas)
-1. Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) and create a free cluster.
-2. Under "Database Access", create a new database user and password.
-3. Under "Network Access", allow access from anywhere (`0.0.0.0/0`).
-4. Click "Connect", choose "Connect your application", and copy your `MONGO_URI`.
-
-### 2. Deploying on Render
-1. Create a free account on [Render](https://render.com/).
-2. Click **New +** and select **Web Service**.
-3. Connect your GitHub account and select your `Music-Hub` repository.
-4. Fill in the following settings:
-   - **Name:** `music-hub-app` (or whatever you prefer)
-   - **Environment:** `Node`
-   - **Build Command:** `npm install`
-   - **Start Command:** `npm start`
-5. **Add Environment Variables**: Scroll down to the "Environment Variables" section and add the following keys from your `.env.example`:
-   - `PORT` = `10000` (Render will automatically assign a port, but adding this is safe)
-   - `MONGO_URI` = `mongodb+srv://<user>:<password>@cluster...` *(Paste the URI from MongoDB Atlas)*
-   - `SESSION_SECRET` = `a-very-long-random-string-like-music-hub-2026!`
-   - `SPOTIFY_CLIENT_ID` = *(Your Spotify Developer Client ID)*
-   - `SPOTIFY_CLIENT_SECRET` = *(Your Spotify Developer Client Secret)*
-   - `NODE_ENV` = `production`
-6. Click **Create Web Service**. Render will now build and deploy your app!
+Before you begin, ensure you have met the following requirements:
+- **Node.js** (v18.0.0 or higher)
+- **MongoDB** (Local instance installed, or a free MongoDB Atlas URI)
+- A **Spotify Developer Account** (to generate Client ID and Secret for the API)
 
 ---
 
-## 💻 Local Development
+## 💻 Installation
 
-To run the project locally on your machine:
+Follow these steps to get your development environment running:
 
-1. Clone the repository: `git clone https://github.com/Abhijeet-kumar-04/Music-Hub.git`
-2. Install dependencies: `npm install`
-3. Create a `.env` file based on `.env.example` and add your database and Spotify credentials.
-4. Run the development server: `npm run dev`
-5. Visit `http://localhost:5000` in your browser.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Abhijeet-kumar-04/Music-Hub.git
+   cd Music-Hub
+   ```
+
+2. **Install the dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Set up Environment Variables:**
+   Rename the `.env.example` file to `.env` (or create a new `.env` file) and fill in your credentials:
+   ```env
+   PORT=5000
+   MONGO_URI=mongodb://localhost:27017/music_full
+   SESSION_SECRET=your_super_secret_session_key
+   SPOTIFY_CLIENT_ID=your_spotify_client_id
+   SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
+   ```
+
+---
+
+## 🚀 Usage
+
+Once your environment is set up and your MongoDB database is running, you can start the application:
+
+**For Development:**
+```bash
+npm run dev
+```
+
+**For Production:**
+```bash
+npm start
+```
+
+1. Open your web browser and navigate to `http://localhost:5000`.
+2. **As a User:** Create an account, browse the dashboard, search for songs, and create your own playlists.
+3. **As an Artist:** Select the "Artist" role during signup to unlock the "Upload Song" dashboard, allowing you to upload local `.mp3` files.
+
+---
+
+## 🗺️ Roadmap / Future Plans
+
+- [ ] **Social Follow System:** Allow users to follow their favorite artists and friends.
+- [ ] **Live Lyrics Integration:** Add synced lyrics to the global audio player.
+- [ ] **PWA Support:** Convert the application into a Progressive Web App for offline capabilities and mobile home-screen installation.
+- [ ] **Audio Visualizer:** Implement Web Audio API for a dynamic EQ visualizer during playback.
+
+---
+
+## 🤝 Contributing
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
 
 ## 📄 License
-This project is open-source and available under the ISC License.
+
+Distributed under the ISC License. See `package.json` for more information.
+
+---
+
+## 🙏 Acknowledgments
+
+- [Spotify Web API Node](https://github.com/thelinmichael/spotify-web-api-node) for the metadata wrapper.
+- JioSaavn Unofficial API structures for providing accessible audio streaming links.
+- All the open-source contributors whose packages made this project possible.
+
+---
+
+## 📬 Contact Information
+
+**Abhijeet Kumar**  
+- **GitHub:** [@Abhijeet-kumar-04](https://github.com/Abhijeet-kumar-04)
+- **Project Link:** [https://github.com/Abhijeet-kumar-04/Music-Hub](https://github.com/Abhijeet-kumar-04/Music-Hub)
