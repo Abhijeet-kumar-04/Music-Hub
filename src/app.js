@@ -6,7 +6,8 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
-const MongoStore = require('connect-mongo');
+const connectMongo = require('connect-mongo');
+const MongoStore = connectMongo.default || connectMongo.MongoStore || connectMongo;
 
 const Playlist = require('./models/playlist');
 const User = require('./models/user');
