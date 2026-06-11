@@ -13,6 +13,7 @@
 
 **Who it is for:** Music Hub is for avid music listeners who want an uninterrupted, ad-free streaming experience, and for independent artists looking for a platform to upload and share their custom tracks alongside mainstream hits.
 
+**Live Demo:** [https://notebook-7qpw.onrender.com](https://music-hub-spy9.onrender.com)
 ---
 
 ## 📑 Table of Contents
