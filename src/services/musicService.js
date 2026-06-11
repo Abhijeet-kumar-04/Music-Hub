@@ -32,7 +32,7 @@ const getDashboardData = async (accountId, role) => {
   let trendingHits = [];
   try {
     const hits = await saavnApi.searchSongs("trending hindi", 1, 30);
-    trendingHits = getDiverseTracks(hits, 6);
+    trendingHits = getDiverseTracks(hits, 12);
   } catch (err) {
     console.error("Trending hits fetch failed:", err);
   }
@@ -40,7 +40,7 @@ const getDashboardData = async (accountId, role) => {
   let recommendedSongs = [];
   try {
     const recs = await saavnApi.searchSongs("latest english songs", 1, 30);
-    recommendedSongs = getDiverseTracks(recs, 6);
+    recommendedSongs = getDiverseTracks(recs, 12);
   } catch (err) {
     console.error("Recommended fetch failed:", err);
   }
